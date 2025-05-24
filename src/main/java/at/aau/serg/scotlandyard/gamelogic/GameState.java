@@ -203,6 +203,33 @@ public class GameState {
         return false;
     }
 
+    public List<MrXDoubleMove> getPossibleDoubleMoves(MrX mrX){
+        List<MrXDoubleMove> doubleMoves = new ArrayList<>();
+
+
+
+        if (!mrX.getTickets().hasTicket(Ticket.DOUBLE)) return doubleMoves;
+
+        int originalPos = mrX.getPosition();
+
+        //Erster möglicher Zug
+        for(Edge firstEdge : board.getConnectionsFrom(originalPos)){
+            int firstTo = firstEdge.getTo();
+            Ticket firstTicket = firstEdge.getTicket();
+
+            mrX.setPos(firstTo);
+            //Zweiter möglicher Zug
+            for(Edge secondEdge : board.getConnectionsFrom(firstTo)){
+                int secondTo = secondEdge.getTo();
+                Ticket secondTicket = secondEdge.getTicket();
+
+                doubleMoves.add(new MrXDoubleMove(firstTo, firstTicket, secondTo, secondTicket));
+            }
+            mrX.setPos(originalPos);
+        }
+        return doubleMoves;
+    }
+
     public String getVisibleMrXPosition() {
         MrX mrX = null;
         for (Player p : players.values()) {
@@ -242,6 +269,7 @@ class MrXMove {
     private final int position;
     private final Ticket ticket;
 
+
     public MrXMove(int position, Ticket ticket) {
         this.position = position;
         this.ticket = ticket;
@@ -254,6 +282,28 @@ class MrXMove {
     public Ticket getTicket() {
         return ticket;
     }
+}
+
+class MrXDoubleMove {
+    private final int firstMove;
+    private final Ticket firstTicket;
+    private final int secondMove;
+    private final Ticket secondTicket;
+
+
+
+
+    public MrXDoubleMove(int firstMove,Ticket firstTicket, int secondMove, Ticket secondTicket) {
+        this.firstMove = firstMove;
+        this.firstTicket = firstTicket;
+        this.secondMove = secondMove;
+        this.secondTicket = secondTicket;
+    }
+
+    public int getFirstMove() { return firstMove; }
+    public int getSecondMove() { return secondMove; }
+    public Ticket getFirstTicket() { return firstTicket; }
+    public Ticket getSecondTicket() { return secondTicket; }
 }
 
 
