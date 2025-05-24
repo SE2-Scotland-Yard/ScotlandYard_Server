@@ -15,11 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ArrayList;
-
+import java.util.*;
 
 
 public class GameState {
@@ -230,6 +226,14 @@ public class GameState {
         return doubleMoves;
     }
 
+    public List<MrXDoubleMove> getAllowedDoubleMoves(String name){
+        Player p = players.get(name);
+        if(p instanceof MrX mrX){
+            return getPossibleDoubleMoves(mrX);
+        }
+        return Collections.emptyList();
+    }
+
     public String getVisibleMrXPosition() {
         MrX mrX = null;
         for (Player p : players.values()) {
@@ -282,28 +286,6 @@ class MrXMove {
     public Ticket getTicket() {
         return ticket;
     }
-}
-
-class MrXDoubleMove {
-    private final int firstMove;
-    private final Ticket firstTicket;
-    private final int secondMove;
-    private final Ticket secondTicket;
-
-
-
-
-    public MrXDoubleMove(int firstMove,Ticket firstTicket, int secondMove, Ticket secondTicket) {
-        this.firstMove = firstMove;
-        this.firstTicket = firstTicket;
-        this.secondMove = secondMove;
-        this.secondTicket = secondTicket;
-    }
-
-    public int getFirstMove() { return firstMove; }
-    public int getSecondMove() { return secondMove; }
-    public Ticket getFirstTicket() { return firstTicket; }
-    public Ticket getSecondTicket() { return secondTicket; }
 }
 
 

@@ -3,6 +3,7 @@ package at.aau.serg.scotlandyard.controller;
 import at.aau.serg.scotlandyard.dto.GameOverviewDTO;
 import at.aau.serg.scotlandyard.gamelogic.GameManager;
 import at.aau.serg.scotlandyard.gamelogic.GameState;
+import at.aau.serg.scotlandyard.gamelogic.MrXDoubleMove;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.Ticket;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -123,6 +124,35 @@ public class GameController {
         }
         return "MrX machte einen Doppelzug: " + firstTo + " → " + secondTo;
     }
+
+    @GetMapping("/allowedDoubleMoves")
+    public ResponseEntity<?> getDoubleMoves(
+            @RequestParam String gameId,
+            @RequestParam String name
+    ){
+        GameState game = gameManager.getGame(gameId);
+
+        if (game == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Game mit ID '" + gameId + "' nicht gefunden.");
+        }
+
+        List<MrXDoubleMove> doubleMoves = game.getAllowedDoubleMoves(name);
+
+        List<Map<String, Object>> response = doubleMoves.stream().map(move -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("firstTo", move.getFirstMove());
+            map.put("firstTicket", move.getFirstTicket().name());
+            map.put("secondTo", move.getSecondMove());
+            map.put("secondTicket", move.getSecondTicket().name());
+            return map;
+        }).toList();
+
+        return ResponseEntity.ok(response);
+
+    }
+
+
 
     @GetMapping("/mrXposition")
     public String getMrXPosition(@RequestParam String gameId) {
