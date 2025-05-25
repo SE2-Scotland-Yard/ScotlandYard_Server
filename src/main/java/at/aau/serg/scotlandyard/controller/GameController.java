@@ -63,6 +63,48 @@ public class GameController {
         logger.info("Allowed moves: {}",allowedMoves);
         return ResponseEntity.ok(allowedMoves);
     }
+
+    @PostMapping("/blackTicket")
+    public Map<String, String> blackTicket(
+            @RequestParam String gameId,
+            @RequestParam String name,
+            @RequestParam int to,
+            @RequestParam String gotTicket
+    ){
+        Map<String, String> response = new HashMap<>();
+        Ticket ticket;
+        try {
+            ticket = Ticket.valueOf(gotTicket);
+        } catch (IllegalArgumentException e) {
+            response.put(MESSAGE, "Ungültiges Ticket: " + gotTicket);
+            return response;
+        }
+
+        GameState game = gameManager.getGame(gameId);
+        if (game == null) {
+            response.put(MESSAGE, "Spiel nicht gefunden!");
+            return response;
+        }
+
+        if (!game.getAllPlayers().containsKey(name)) {
+            response.put(MESSAGE, "Spieler " + name + " existiert nicht!");
+            return response;
+        }
+
+        if (!game.movePlayer(name, to, ticket)) {
+            response.put(MESSAGE, "Ungültiger Zug!");
+            return response;
+        }
+
+        if (game.getWinner() != GameState.Winner.NONE) {
+            response.put(MESSAGE, getWinner(gameId));
+            return response;
+        }
+
+        response.put(MESSAGE, "Spieler " + name + " bewegt sich zu " + to + " in Spiel " + gameId);
+        return response;
+    }
+
     @PostMapping("/move")
     public Map<String, String> move(
             @RequestParam String gameId,
