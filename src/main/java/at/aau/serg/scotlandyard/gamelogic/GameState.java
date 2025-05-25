@@ -15,11 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ArrayList;
-
+import java.util.*;
 
 
 public class GameState {
@@ -203,6 +199,41 @@ public class GameState {
         return false;
     }
 
+    public List<MrXDoubleMove> getPossibleDoubleMoves(MrX mrX){
+        List<MrXDoubleMove> doubleMoves = new ArrayList<>();
+
+
+
+        if (!mrX.getTickets().hasTicket(Ticket.DOUBLE)) return doubleMoves;
+
+        int originalPos = mrX.getPosition();
+
+        //Erster möglicher Zug
+        for(Edge firstEdge : board.getConnectionsFrom(originalPos)){
+            int firstTo = firstEdge.getTo();
+            Ticket firstTicket = firstEdge.getTicket();
+
+            mrX.setPos(firstTo);
+            //Zweiter möglicher Zug
+            for(Edge secondEdge : board.getConnectionsFrom(firstTo)){
+                int secondTo = secondEdge.getTo();
+                Ticket secondTicket = secondEdge.getTicket();
+
+                doubleMoves.add(new MrXDoubleMove(firstTo, firstTicket, secondTo, secondTicket));
+            }
+            mrX.setPos(originalPos);
+        }
+        return doubleMoves;
+    }
+
+    public List<MrXDoubleMove> getAllowedDoubleMoves(String name){
+        Player p = players.get(name);
+        if(p instanceof MrX mrX){
+            return getPossibleDoubleMoves(mrX);
+        }
+        return Collections.emptyList();
+    }
+
     public String getVisibleMrXPosition() {
         MrX mrX = null;
         for (Player p : players.values()) {
@@ -241,6 +272,7 @@ public class GameState {
 class MrXMove {
     private final int position;
     private final Ticket ticket;
+
 
     public MrXMove(int position, Ticket ticket) {
         this.position = position;

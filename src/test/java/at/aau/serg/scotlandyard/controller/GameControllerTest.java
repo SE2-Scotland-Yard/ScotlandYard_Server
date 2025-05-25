@@ -150,9 +150,13 @@ class GameControllerTest {
     void moveDouble_WhenGameNotFound_ReturnsGameNotFound() {
         when(gameManager.getGame(gameId)).thenReturn(null);
 
-        String result = gameController.moveDouble(gameId, playerName, position, Ticket.TAXI, position + 1, Ticket.BUS);
+        ResponseEntity<Map<String, Object>> response = gameController.moveDouble(
+                gameId, playerName, position, Ticket.TAXI, position + 1, Ticket.BUS
+        );
 
-        assertEquals(GameController.GAME_NOT_FOUND, result);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Spiel nicht gefunden!", response.getBody().get("message"));
+        assertEquals("error", response.getBody().get("status"));
     }
 
     @Test
@@ -160,9 +164,13 @@ class GameControllerTest {
         when(gameManager.getGame(gameId)).thenReturn(gameState);
         when(gameState.moveMrXDouble(playerName, position, Ticket.TAXI, position + 1, Ticket.BUS)).thenReturn(false);
 
-        String result = gameController.moveDouble(gameId, playerName, position, Ticket.TAXI, position + 1, Ticket.BUS);
+        ResponseEntity<Map<String, Object>> response = gameController.moveDouble(
+                gameId, playerName, position, Ticket.TAXI, position + 1, Ticket.BUS
+        );
 
-        assertEquals("Ungültiger Doppelzug!", result);
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Ungültiger Doppelzug!", response.getBody().get("message"));
+        assertEquals("error", response.getBody().get("status"));
     }
 
     @Test
@@ -170,9 +178,13 @@ class GameControllerTest {
         when(gameManager.getGame(gameId)).thenReturn(gameState);
         when(gameState.moveMrXDouble(playerName, position, Ticket.TAXI, position + 1, Ticket.BUS)).thenReturn(true);
 
-        String result = gameController.moveDouble(gameId, playerName, position, Ticket.TAXI, position + 1, Ticket.BUS);
+        ResponseEntity<Map<String, Object>> response = gameController.moveDouble(
+                gameId, playerName, position, Ticket.TAXI, position + 1, Ticket.BUS
+        );
 
-        assertEquals("MrX machte einen Doppelzug: " + position + " → " + (position + 1), result);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("MrX machte einen Doppelzug: " + position + " → " + (position + 1), response.getBody().get("message"));
+        assertEquals("success", response.getBody().get("status"));
     }
 
     @Test

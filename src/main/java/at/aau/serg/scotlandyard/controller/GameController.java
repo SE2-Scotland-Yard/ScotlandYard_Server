@@ -3,6 +3,7 @@ package at.aau.serg.scotlandyard.controller;
 import at.aau.serg.scotlandyard.dto.GameOverviewDTO;
 import at.aau.serg.scotlandyard.gamelogic.GameManager;
 import at.aau.serg.scotlandyard.gamelogic.GameState;
+import at.aau.serg.scotlandyard.gamelogic.MrXDoubleMove;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.Ticket;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -110,19 +111,59 @@ public class GameController {
     }
 
     @PostMapping("/moveDouble")
-    public String moveDouble(@RequestParam String gameId,
-                             @RequestParam String name,
-                             @RequestParam int firstTo,
-                             @RequestParam Ticket firstTicket,
-                             @RequestParam int secondTo,
-                             @RequestParam Ticket secondTicket) {
+    public ResponseEntity<Map<String, Object>> moveDouble(@RequestParam String gameId,
+                                                          @RequestParam String name,
+                                                          @RequestParam int firstTo,
+                                                          @RequestParam Ticket firstTicket,
+                                                          @RequestParam int secondTo,
+                                                          @RequestParam Ticket secondTicket) {
+        Map<String, Object> response = new HashMap<>();
         GameState game = gameManager.getGame(gameId);
-        if (game == null) return GAME_NOT_FOUND;
-        if (!game.moveMrXDouble(name, firstTo, firstTicket, secondTo, secondTicket)) {
-            return "Ungültiger Doppelzug!";
+        if (game == null) {
+            response.put("status", "error");
+            response.put("message", "Spiel nicht gefunden!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
-        return "MrX machte einen Doppelzug: " + firstTo + " → " + secondTo;
+
+        if (!game.moveMrXDouble(name, firstTo, firstTicket, secondTo, secondTicket)) {
+            response.put("status", "error");
+            response.put("message", "Ungültiger Doppelzug!");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        response.put("status", "success");
+        response.put("message", "MrX machte einen Doppelzug: " + firstTo + " → " + secondTo);
+        return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/allowedDoubleMoves")
+    public ResponseEntity<?> getDoubleMoves(
+            @RequestParam String gameId,
+            @RequestParam String name
+    ){
+        GameState game = gameManager.getGame(gameId);
+
+        if (game == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Game mit ID '" + gameId + "' nicht gefunden.");
+        }
+
+        List<MrXDoubleMove> doubleMoves = game.getAllowedDoubleMoves(name);
+
+        List<Map<String, Object>> response = doubleMoves.stream().map(move -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("firstTo", move.getFirstMove());
+            map.put("firstTicket", move.getFirstTicket().name());
+            map.put("secondTo", move.getSecondMove());
+            map.put("secondTicket", move.getSecondTicket().name());
+            return map;
+        }).toList();
+
+        return ResponseEntity.ok(response);
+
+    }
+
+
 
     @GetMapping("/mrXposition")
     public String getMrXPosition(@RequestParam String gameId) {

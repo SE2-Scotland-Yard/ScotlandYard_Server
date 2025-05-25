@@ -22,4 +22,8 @@
   "id" : 6,
   "username" : "2",
   "password" : "$2a$10$UdCC0t5L2UgsnophZXZrN.2T/uTZXF9EC0sAdGazdSn0iiWh4ytBC"
+}, {
+  "id" : 7,
+  "username" : "23",
+  "password" : "$2a$10$60YOlXGNOxR7CK1tb.I5JOXmsT0X1UNjsFMFEEd4dFIu92UTv4WFC"
 } ]
