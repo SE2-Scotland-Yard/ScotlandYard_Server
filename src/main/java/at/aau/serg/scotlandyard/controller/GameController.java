@@ -111,18 +111,29 @@ public class GameController {
     }
 
     @PostMapping("/moveDouble")
-    public String moveDouble(@RequestParam String gameId,
-                             @RequestParam String name,
-                             @RequestParam int firstTo,
-                             @RequestParam Ticket firstTicket,
-                             @RequestParam int secondTo,
-                             @RequestParam Ticket secondTicket) {
+    public ResponseEntity<Map<String, Object>> moveDouble(@RequestParam String gameId,
+                                                          @RequestParam String name,
+                                                          @RequestParam int firstTo,
+                                                          @RequestParam Ticket firstTicket,
+                                                          @RequestParam int secondTo,
+                                                          @RequestParam Ticket secondTicket) {
+        Map<String, Object> response = new HashMap<>();
         GameState game = gameManager.getGame(gameId);
-        if (game == null) return GAME_NOT_FOUND;
-        if (!game.moveMrXDouble(name, firstTo, firstTicket, secondTo, secondTicket)) {
-            return "Ungültiger Doppelzug!";
+        if (game == null) {
+            response.put("status", "error");
+            response.put("message", "Spiel nicht gefunden!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
-        return "MrX machte einen Doppelzug: " + firstTo + " → " + secondTo;
+
+        if (!game.moveMrXDouble(name, firstTo, firstTicket, secondTo, secondTicket)) {
+            response.put("status", "error");
+            response.put("message", "Ungültiger Doppelzug!");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        response.put("status", "success");
+        response.put("message", "MrX machte einen Doppelzug: " + firstTo + " → " + secondTo);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/allowedDoubleMoves")
