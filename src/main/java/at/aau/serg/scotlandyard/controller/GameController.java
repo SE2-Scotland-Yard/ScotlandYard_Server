@@ -91,7 +91,7 @@ public class GameController {
             return response;
         }
 
-        if (!game.movePlayer(name, to, ticket)) {
+        if (!game.moveBlackTicket(name, to, ticket)) {
             response.put(MESSAGE, "Ungültiger Zug!");
             return response;
         }

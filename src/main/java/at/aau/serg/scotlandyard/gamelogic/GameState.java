@@ -87,6 +87,30 @@ public class GameState {
         return position;
     }
 
+    public boolean moveBlackTicket(String name, int to, Ticket ticket) {
+        Player p = players.get(name);
+        if (p instanceof MrX mrX && mrX.isValidMove(to, ticket, board)) {
+            mrX.moveBlack(to, ticket, board);
+            mrXHistory.put(currentRound, new MrXMove(to, ticket));
+            currentRound++;
+            roundManager.nextTurn();
+
+            playerPositions = roundManager.getPlayerPositions();
+
+            String nextPlayer = getCurrentPlayerName();
+            logger.info("➡️ currentRound: {}, nextPlayer: {}", currentRound, nextPlayer);
+            messaging.convertAndSend("/topic/game/" + gameId,
+                    GameMapper.mapToGameUpdate(
+                            gameId,
+                            playerPositions,
+                            getCurrentPlayerName()
+                    )
+            );
+            return true;
+        }
+        return false;
+    }
+
     public boolean movePlayer(String name, int to, Ticket ticket) {
         Player p = players.get(name);
 
