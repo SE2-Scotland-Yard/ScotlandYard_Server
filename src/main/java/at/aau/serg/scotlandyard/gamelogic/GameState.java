@@ -104,7 +104,8 @@ public class GameState {
                     GameMapper.mapToGameUpdate(
                             gameId,
                             playerPositions,
-                            getCurrentPlayerName()
+                            getCurrentPlayerName(),
+                            ticket
                     )
             );
                 return true;
@@ -124,7 +125,8 @@ public class GameState {
                     GameMapper.mapToGameUpdate(
                             gameId,
                             playerPositions,
-                            getCurrentPlayerName()
+                            getCurrentPlayerName(),
+                            ticket
                     )
             );
             return true;
