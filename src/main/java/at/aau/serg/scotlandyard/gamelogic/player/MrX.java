@@ -74,4 +74,15 @@ public class MrX extends Player {
 
         logger.info("MrX machte einen Doppelzug: {} → {}", firstTo, secondTo);
     }
+
+
+    public void moveBlack(int to, Ticket ticket, Board board){
+        if (isValidMove(to, ticket, board)) {
+            tickets.useTicket(Ticket.BLACK);
+            setPos(to);
+        } else {
+            throw new IllegalArgumentException("Invalid move!");
+        }
+
+    }
 }
