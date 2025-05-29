@@ -42,5 +42,5 @@ class GameUpdateTest {
         assertNull(update.getPlayerPositions());
         assertNull(update.getCurrentPlayer());
     }
-    
+
 }
