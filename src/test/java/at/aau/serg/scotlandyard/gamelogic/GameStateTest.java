@@ -123,10 +123,30 @@ class GameStateTest {
 
 
     @Test
+    void testMoveMrXDouble() {
+        gameState.moveMrXDouble("MrX",1,Ticket.TAXI,2,Ticket.TAXI);
+        assertEquals(2, gameState.getMrXMoveHistory().size());
+    }
+
+    @Test
     void testMoveMrXDoubleInvalid() {
         boolean successful = gameState.moveMrXDouble("Detective", 1, Ticket.TAXI, 1, Ticket.TAXI);
         assertFalse(successful);
         verify(mrX, never()).move(anyInt(), any(), any());
+    }
+
+    @Test
+    void testGetVisibleMrXPosition() {
+        //get to revealRound
+        when(mrX.isValidMove(anyInt(), any(), any())).thenReturn(true);
+        gameState.movePlayer("MrX", 1, Ticket.TAXI);
+        gameState.movePlayer("MrX", 8, Ticket.TAXI);
+        gameState.movePlayer("MrX", 19, Ticket.TAXI);
+
+        //test correct String
+        when(mrX.getPosition()).thenReturn(19);
+        assertEquals("19", gameState.getVisibleMrXPosition());
+
     }
 
     @Test
@@ -281,5 +301,24 @@ class GameStateTest {
         assertEquals(0, gameState.getAllowedDoubleMoves("MrX").size());
     }
 
+    @Test
+    void testGetCurrentPlayerNameNull() throws Exception {
+        Field nameField = GameState.class.getDeclaredField("roundManager");
+        nameField.setAccessible(true);
+        nameField.set(gameState, null);
+        assertNull(gameState.getCurrentPlayerName());
+    }
+
+    @Test
+    void testGetCurrentPlayerNameNoPlayer() throws Exception {
+        RoundManager roundManager = mock(RoundManager.class);
+        when(roundManager.getCurrentPlayer()).thenReturn(null);
+
+        Field nameField = GameState.class.getDeclaredField("roundManager");
+        nameField.setAccessible(true);
+        nameField.set(gameState, roundManager);
+        assertNull(gameState.getCurrentPlayerName());
+
+    }
 
 }
