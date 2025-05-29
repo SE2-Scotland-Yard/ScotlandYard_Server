@@ -3,6 +3,7 @@ package at.aau.serg.scotlandyard.gamelogic;
 
 import at.aau.serg.scotlandyard.dto.GameMapper;
 
+import at.aau.serg.scotlandyard.dto.GameUpdate;
 import at.aau.serg.scotlandyard.gamelogic.board.Board;
 import at.aau.serg.scotlandyard.gamelogic.board.Edge;
 import at.aau.serg.scotlandyard.gamelogic.player.Detective;
@@ -104,7 +105,7 @@ public class GameState {
                             gameId,
                             playerPositions,
                             getCurrentPlayerName(),
-                            getWinner().toString(),
+                            getWinner(gameId).toString(),
                             Ticket.BLACK
                     )
             );
@@ -125,9 +126,9 @@ public class GameState {
 
 
             playerPositions = roundManager.getPlayerPositions();
-            String winner = getWinner().toString();
+            String winner = getWinner(gameId).toString();
             String nextPlayer = getCurrentPlayerName();
-            logger.info("➡️ currentRound: {}, nextPlayer: {}, WINNER: {}", currentRound, nextPlayer,getWinner().toString());
+            logger.info("➡️ currentRound: {}, nextPlayer: {}, WINNER: {}", currentRound, nextPlayer,getWinner(gameId).toString());
             messaging.convertAndSend("/topic/game/" + gameId,
                     GameMapper.mapToGameUpdate(
                             gameId,
@@ -154,9 +155,9 @@ public class GameState {
             roundManager.addMrXTicket(ticket);
 
             String nextPlayer = getCurrentPlayerName();
-            String winner = getWinner().toString();
+            String winner = getWinner(gameId).toString();
             logger.info("➡️ currentRound: {}, nextPlayer: {}", currentRound, nextPlayer);
-            logger.info("WINNER: {}", getWinner().toString());
+            logger.info("WINNER: {}", getWinner(gameId).toString());
             messaging.convertAndSend("/topic/game/" + gameId,
                     GameMapper.mapToGameUpdate(
                             gameId,
@@ -205,7 +206,7 @@ public class GameState {
     //Winning Condition
     public enum Winner{ MR_X, DETECTIVE, NONE}
 
-    public Winner getWinner(){
+    public Winner getWinner(String gameId){
         if(!roundManager.isGameOver()){
             return Winner.NONE; //Game still running
         }

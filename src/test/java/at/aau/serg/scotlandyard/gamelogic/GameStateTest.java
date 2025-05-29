@@ -200,7 +200,7 @@ class GameStateTest {
         nameField.setAccessible(true);
         nameField.set(gameState, roundManager);
 
-        assertEquals(GameState.Winner.NONE, gameState.getWinner());
+        assertEquals(GameState.Winner.NONE, gameState.getWinner("123"));
     }
 
     @Test
@@ -213,7 +213,7 @@ class GameStateTest {
         nameField.setAccessible(true);
         nameField.set(gameState, roundManager);
 
-        assertEquals(GameState.Winner.DETECTIVE, gameState.getWinner());
+        assertEquals(GameState.Winner.DETECTIVE, gameState.getWinner("123"));
     }
 
     @Test
@@ -226,7 +226,7 @@ class GameStateTest {
         nameField.setAccessible(true);
         nameField.set(gameState, roundManager);
 
-        assertEquals(GameState.Winner.MR_X, gameState.getWinner());
+        assertEquals(GameState.Winner.MR_X, gameState.getWinner("123"));
     }
 
     @Test
