@@ -124,7 +124,7 @@ class GameControllerTest {
         when(gameManager.getGame(gameId)).thenReturn(gameState);
         when(gameState.getAllPlayers()).thenReturn(players);
         when(gameState.movePlayer(playerName, position, Ticket.TAXI)).thenReturn(true);
-        when(gameState.getWinner()).thenReturn(GameState.Winner.NONE);
+        when(gameState.getWinner(gameId)).thenReturn(GameState.Winner.NONE);
 
         Map<String, String> result = gameController.move(gameId, playerName, position, "TAXI");
 
@@ -139,7 +139,7 @@ class GameControllerTest {
         when(gameManager.getGame(gameId)).thenReturn(gameState);
         when(gameState.getAllPlayers()).thenReturn(players);
         when(gameState.movePlayer(playerName, position, Ticket.TAXI)).thenReturn(true);
-        when(gameState.getWinner()).thenReturn(GameState.Winner.MR_X);
+        when(gameState.getWinner(gameId)).thenReturn(GameState.Winner.MR_X);
 
         Map<String, String> result = gameController.move(gameId, playerName, position, "TAXI");
 
@@ -265,7 +265,7 @@ class GameControllerTest {
     @Test
     void getWinner_WhenMrXWins_ReturnsMrXWonMessage() {
         when(gameManager.getGame(gameId)).thenReturn(gameState);
-        when(gameState.getWinner()).thenReturn(GameState.Winner.MR_X);
+        when(gameState.getWinner(gameId)).thenReturn(GameState.Winner.MR_X);
 
         String result = gameController.getWinner(gameId);
 
@@ -275,7 +275,7 @@ class GameControllerTest {
     @Test
     void getWinner_WhenDetectivesWin_ReturnsDetectivesWonMessage() {
         when(gameManager.getGame(gameId)).thenReturn(gameState);
-        when(gameState.getWinner()).thenReturn(GameState.Winner.DETECTIVE);
+        when(gameState.getWinner(gameId)).thenReturn(GameState.Winner.DETECTIVE);
 
         String result = gameController.getWinner(gameId);
 
@@ -285,7 +285,7 @@ class GameControllerTest {
     @Test
     void getWinner_WhenGameStillRunning_ReturnsGameStillRunningMessage() {
         when(gameManager.getGame(gameId)).thenReturn(gameState);
-        when(gameState.getWinner()).thenReturn(GameState.Winner.NONE);
+        when(gameState.getWinner(gameId)).thenReturn(GameState.Winner.NONE);
 
         String result = gameController.getWinner(gameId);
 

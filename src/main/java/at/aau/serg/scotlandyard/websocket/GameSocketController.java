@@ -76,7 +76,7 @@ public class GameSocketController {
         GameState game = gameManager.getGame(gameId);
         if (game == null) return;
 
-        String winner = switch (game.getWinner()) {
+        String winner = switch (game.getWinner("123")) {
             case MR_X -> "Mr.X hat gewonnen!";
             case DETECTIVE -> "Detektive haben gewonnen!";
             default -> "Spiel läuft noch.";

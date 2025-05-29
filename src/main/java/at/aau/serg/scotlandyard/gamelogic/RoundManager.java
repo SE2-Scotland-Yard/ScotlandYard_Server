@@ -1,9 +1,11 @@
 package at.aau.serg.scotlandyard.gamelogic;
 
+import at.aau.serg.scotlandyard.dto.GameOverviewDTO;
 import at.aau.serg.scotlandyard.gamelogic.player.*;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.Ticket;
 import lombok.Getter;
 import org.slf4j.Logger;
+import at.aau.serg.scotlandyard.gamelogic.GameManager;
 import org.slf4j.LoggerFactory;
 
 
@@ -25,6 +27,7 @@ public class RoundManager {
 
     private final List<Integer> revealRounds = Arrays.asList(3,8,13,18,24); //for Mr.X
     private static final Logger logger = LoggerFactory.getLogger(GameState.class);
+    private GameManager gameManager;
 
     public RoundManager(List<Detective> detectives, MrX mrX) {
         this.detectives = detectives;
@@ -88,6 +91,11 @@ public class RoundManager {
 
     public boolean isGameOver(){
         return currentRound > MAXROUNDS || isMrXCaptured();
+    }
+    public void gameOver(String gameId) {
+        logger.info("Game {} is over",gameId);
+        gameManager.getGame(gameId);
+        gameManager.removeGame(gameId);
     }
 
     public void addMrXTicket(Ticket ticket){
