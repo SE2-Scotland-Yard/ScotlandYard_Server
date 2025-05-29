@@ -156,6 +156,22 @@ class GameStateTest {
     }
 
     @Test
+    void testGetMrXMoveHistoryInvalid() throws Exception {//spielt 1 Runde, setzt diese aber auf null
+        HashMap<Integer, MrXMove> mrXMoveHistory = new HashMap<>();
+        mrXMoveHistory.put(1, null);
+
+        when(mrX.isValidMove(anyInt(), any(Ticket.class), any(Board.class))).thenReturn(true);
+        gameState.movePlayer("MrX", 1, Ticket.TAXI);
+
+        Field nameField = GameState.class.getDeclaredField("mrXHistory");
+        nameField.setAccessible(true);
+        nameField.set(gameState, mrXMoveHistory);
+
+
+        assertEquals(new ArrayList<>(), gameState.getMrXMoveHistory());
+    }
+
+    @Test
     void testGetWinnerNone() throws Exception {
         RoundManager roundManager = mock(RoundManager.class);
         when(roundManager.isGameOver()).thenReturn(false);
