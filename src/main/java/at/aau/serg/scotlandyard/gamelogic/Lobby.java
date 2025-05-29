@@ -17,6 +17,7 @@ public class Lobby {
     private final boolean isPublic;
     private boolean started = false;
     private final Map<String, Integer> avatars = new ConcurrentHashMap<>();
+    private final Map<String, Long> lastActivityMap = new HashMap<>();
 
     public Lobby(String gameId, boolean isPublic) {
         this.gameId = gameId;
@@ -91,6 +92,14 @@ public class Lobby {
         return selectedRoles.values().stream()
                 .filter(role -> role == Role.MRX)
                 .count() == 1;
+    }
+
+    public void updateLastActivity(String playerId) {
+        lastActivityMap.put(playerId, System.currentTimeMillis());
+    }
+
+    public Long getLastActivity(String playerId) {
+        return lastActivityMap.getOrDefault(playerId, 0L);
     }
 
 
