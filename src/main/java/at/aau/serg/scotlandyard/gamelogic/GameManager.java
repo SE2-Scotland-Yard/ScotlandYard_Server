@@ -24,7 +24,7 @@ public class GameManager {
     }
 
     public GameState getGame(String gameId) {
-        return games.getOrDefault(gameId, null);
+        return games.get(gameId);
     }
 
     public void removeGame(String gameId) {
