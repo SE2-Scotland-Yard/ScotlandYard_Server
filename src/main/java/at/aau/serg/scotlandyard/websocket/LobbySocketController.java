@@ -7,6 +7,7 @@ import at.aau.serg.scotlandyard.gamelogic.player.MrX;
 import at.aau.serg.scotlandyard.gamelogic.player.Player;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.slf4j.Logger;
@@ -35,9 +36,16 @@ public class LobbySocketController {
         Lobby lobby = lobbyManager.getLobby(gameId);
         if (lobby == null) return;
 
+        //Aktivität updaten
+        lobby.updateLastActivity(msg.getPlayerId());
+
+        //Spieler als bereit markieren
         lobby.markReady(msg.getPlayerId());
+
+        //Lobby-Zustand an Clients senden
         messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId, LobbyMapper.toLobbyState(lobby));
 
+        //Spielstart prüfen
         if (lobby.allReady() && lobby.hasEnoughPlayers() && !lobby.isStarted()) {
             if (!lobby.hasExactlyOneMrX()) {
                 // Broadcast-Fehlermeldung an alle in der Lobby
@@ -100,6 +108,10 @@ public class LobbySocketController {
     public void selectRole(RoleSelectionMessage msg) {
         Lobby lobby = lobbyManager.getLobby(msg.getGameId());
         if (lobby != null) {
+
+            //Aktivität updaten
+            lobby.updateLastActivity(msg.getPlayerId());
+
             String currentRole = String.valueOf(lobby.getSelectedRole(msg.getPlayerId()));
 
             boolean roleChanged = !msg.getRole().equals(currentRole);
@@ -123,6 +135,10 @@ public class LobbySocketController {
     @MessageMapping("/lobby/avatar")
     public void handleAvatarSelection(AvatarSelectionMessage msg) {
         Lobby lobby = lobbyManager.getLobby(msg.getGameId());
+
+        //Aktivität updaten
+        lobby.updateLastActivity(msg.getPlayerId());
+
         if (lobby != null && Role.DETECTIVE.equals(lobby.getSelectedRole(msg.getPlayerId()))) {
             int desiredAvatar = msg.getAvatarResId();
             String playerId = msg.getPlayerId();
@@ -148,6 +164,22 @@ public class LobbySocketController {
         }
         return null;
     }
+
+    @MessageMapping("/lobby/leave")
+    public void handleLeave(@Payload LeaveRequest request) {
+        String gameId = request.getGameId();
+        String playerId = request.getPlayerId();
+
+        Lobby lobby = lobbyManager.getLobby(gameId);
+        if (lobby != null) {
+            lobbyManager.leaveLobby(gameId, playerId);
+            messaging.convertAndSend("/topic/lobby/" + gameId, LobbyMapper.toLobbyState(lobby));
+        }
+    }
+
+
+
+
 
 
 
