@@ -26,7 +26,8 @@ public class LobbyMapper {
                 roleMap,
                 lobby.isPublic(),
                 lobby.isStarted(),
-                6
+                6,
+                new HashMap<>(lobby.getAvatars())
         );
 
     }
