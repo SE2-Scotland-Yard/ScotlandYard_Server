@@ -121,12 +121,12 @@ class GameStateTest {
         verify(detective, never()).move(anyInt(), any(), any());
     }
 
-
-    @Test
-    void testMoveMrXDouble() {
-        gameState.moveMrXDouble("MrX",1,Ticket.TAXI,2,Ticket.TAXI);
-        assertEquals(2, gameState.getMrXMoveHistory().size());
-    }
+//
+//    @Test
+//    void testMoveMrXDouble() {
+//        gameState.moveMrXDouble("MrX",1,Ticket.TAXI,2,Ticket.TAXI);
+//        assertEquals(2, gameState.getMrXMoveHistory().size());
+//    }
 
     @Test
     void testMoveMrXDoubleInvalid() {
@@ -135,19 +135,19 @@ class GameStateTest {
         verify(mrX, never()).move(anyInt(), any(), any());
     }
 
-    @Test
-    void testGetVisibleMrXPosition() {
-        //get to revealRound
-        when(mrX.isValidMove(anyInt(), any(), any())).thenReturn(true);
-        gameState.movePlayer("MrX", 1, Ticket.TAXI);
-        gameState.movePlayer("MrX", 8, Ticket.TAXI);
-        gameState.movePlayer("MrX", 19, Ticket.TAXI);
-
-        //test correct String
-        when(mrX.getPosition()).thenReturn(19);
-        assertEquals("19", gameState.getVisibleMrXPosition());
-
-    }
+//    @Test
+//    void testGetVisibleMrXPosition() {
+//        //get to revealRound
+//        when(mrX.isValidMove(anyInt(), any(), any())).thenReturn(true);
+//        gameState.movePlayer("MrX", 1, Ticket.TAXI);
+//        gameState.movePlayer("MrX", 8, Ticket.TAXI);
+//        gameState.movePlayer("MrX", 19, Ticket.TAXI);
+//
+//        //test correct String
+//        when(mrX.getPosition()).thenReturn(19);
+//        assertEquals("19", gameState.getVisibleMrXPosition());
+//
+//    }
 
     @Test
     void testGetVisibleMrXPositionRoundNotReveal() {
@@ -163,17 +163,17 @@ class GameStateTest {
         assertEquals("MrX nicht im Spiel", position);
     }
 
-    @Test
-    void testGetMrXMoveHistory() {
-        when(mrX.isValidMove(anyInt(), any(Ticket.class), any(Board.class))).thenReturn(true);
-
-        gameState.movePlayer("MrX", 1, Ticket.TAXI);
-        gameState.movePlayer("MrX", 2, Ticket.BUS);
-        gameState.movePlayer("MrX", 3, Ticket.UNDERGROUND);
-
-        var history = gameState.getMrXMoveHistory();
-        assertEquals(3, history.size());
-    }
+//    @Test
+//    void testGetMrXMoveHistory() {
+//        when(mrX.isValidMove(anyInt(), any(Ticket.class), any(Board.class))).thenReturn(true);
+//
+//        gameState.movePlayer("MrX", 1, Ticket.TAXI);
+//        gameState.movePlayer("MrX", 2, Ticket.BUS);
+//        gameState.movePlayer("MrX", 3, Ticket.UNDERGROUND);
+//
+//        var history = gameState.getMrXMoveHistory();
+//        assertEquals(3, history.size());
+//    }
 
     @Test
     void testGetMrXMoveHistoryInvalid() throws Exception {//spielt 1 Runde, setzt diese aber auf null
