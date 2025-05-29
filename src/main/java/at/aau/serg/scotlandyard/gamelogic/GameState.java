@@ -3,7 +3,6 @@ package at.aau.serg.scotlandyard.gamelogic;
 
 import at.aau.serg.scotlandyard.dto.GameMapper;
 
-import at.aau.serg.scotlandyard.dto.GameUpdate;
 import at.aau.serg.scotlandyard.gamelogic.board.Board;
 import at.aau.serg.scotlandyard.gamelogic.board.Edge;
 import at.aau.serg.scotlandyard.gamelogic.player.Detective;
@@ -105,7 +104,8 @@ public class GameState {
                             gameId,
                             playerPositions,
                             getCurrentPlayerName(),
-                            getWinner(gameId).toString()
+                            getWinner().toString(),
+                            Ticket.BLACK
                     )
             );
             return true;
@@ -118,20 +118,26 @@ public class GameState {
 
         if (p instanceof MrX mrX && mrX.isValidMove(to, ticket, board)) {
                 mrX.move(to, ticket, board);
-                mrXHistory.put(currentRound, new MrXMove(to, ticket));
-                currentRound++;
-                roundManager.nextTurn();
+            int roundBefore = roundManager.getCurrentRound();
+            mrXHistory.put(roundBefore, new MrXMove(to, ticket));
+            roundManager.nextTurn();
+
+
 
             playerPositions = roundManager.getPlayerPositions();
-            String winner = getWinner(gameId).toString();
+            String winner = getWinner().toString();
             String nextPlayer = getCurrentPlayerName();
-            logger.info("➡️ currentRound: {}, nextPlayer: {}, WINNER: {}", currentRound, nextPlayer,getWinner(gameId).toString());
+            logger.info("➡️ currentRound: {}, nextPlayer: {}, WINNER: {}", currentRound, nextPlayer,getWinner().toString());
             messaging.convertAndSend("/topic/game/" + gameId,
                     GameMapper.mapToGameUpdate(
                             gameId,
                             playerPositions,
                             getCurrentPlayerName(),
-                            winner
+                            winner,
+                            ticket
+
+                           
+
                     )
             );
                 if(winner == "DETECTIVE"||winner == "MRX") {
@@ -142,22 +148,23 @@ public class GameState {
         if (p != null && p.isValidMove(to, ticket, board)) {
             p.move(to, ticket, board);
             playerPositions = roundManager.getPlayerPositions();
-            currentRound++;
             roundManager.nextTurn();
 
 
             roundManager.addMrXTicket(ticket);
 
             String nextPlayer = getCurrentPlayerName();
-            String winner = getWinner(gameId).toString();
+            String winner = getWinner().toString();
             logger.info("➡️ currentRound: {}, nextPlayer: {}", currentRound, nextPlayer);
-            logger.info("WINNER: {}", getWinner(gameId).toString());
+            logger.info("WINNER: {}", getWinner().toString());
             messaging.convertAndSend("/topic/game/" + gameId,
                     GameMapper.mapToGameUpdate(
                             gameId,
                             playerPositions,
                             getCurrentPlayerName(),
-                            winner
+                            winner,
+                            ticket
+
                     )
             );
             if(winner == "DETECTIVE"||winner == "MRX") {
@@ -198,7 +205,7 @@ public class GameState {
     //Winning Condition
     public enum Winner{ MR_X, DETECTIVE, NONE}
 
-    public Winner getWinner(String gameId){
+    public Winner getWinner(){
         if(!roundManager.isGameOver()){
             return Winner.NONE; //Game still running
         }
@@ -223,10 +230,17 @@ public class GameState {
         Player p = players.get(name);
         if (p instanceof MrX mrX) {
             try {
+
+                int roundBefore = roundManager.getCurrentRound();
+
                 mrX.moveDouble(firstTo, firstTicket, secondTo, secondTicket, board);
-                mrXHistory.put(currentRound, new MrXMove(firstTo, firstTicket));
-                mrXHistory.put(currentRound + 1, new MrXMove(secondTo, secondTicket));
-                currentRound+=2;
+
+                mrXHistory.put(roundBefore, new MrXMove(firstTo, firstTicket));
+                mrXHistory.put(roundBefore + 1, new MrXMove(secondTo, secondTicket));
+
+                //zwei Runden vorrücken
+                roundManager.nextTurn();
+                roundManager.nextTurn();
                 return true;
             } catch (IllegalArgumentException e) {
                 logger.info("Ungültiger Doppelzug von MrX: {}" , e.getMessage());
@@ -235,39 +249,38 @@ public class GameState {
         return false;
     }
 
-    public List<MrXDoubleMove> getPossibleDoubleMoves(MrX mrX){
+    public List<MrXDoubleMove> getAllowedDoubleMoves(String name){
+        Player p = players.get(name);
+        if (!(p instanceof MrX mrX)) {
+            return Collections.emptyList();
+        }
         List<MrXDoubleMove> doubleMoves = new ArrayList<>();
-
-
 
         if (!mrX.getTickets().hasTicket(Ticket.DOUBLE)) return doubleMoves;
 
         int originalPos = mrX.getPosition();
 
         //Erster möglicher Zug
-        for(Edge firstEdge : board.getConnectionsFrom(originalPos)){
+        for (Edge firstEdge : board.getConnectionsFrom(originalPos)) {
             int firstTo = firstEdge.getTo();
             Ticket firstTicket = firstEdge.getTicket();
 
             mrX.setPos(firstTo);
             //Zweiter möglicher Zug
-            for(Edge secondEdge : board.getConnectionsFrom(firstTo)){
-                int secondTo = secondEdge.getTo();
-                Ticket secondTicket = secondEdge.getTicket();
+            if (mrX.getTickets().hasTicket(firstTicket)) {
 
-                doubleMoves.add(new MrXDoubleMove(firstTo, firstTicket, secondTo, secondTicket));
+                for (Edge secondEdge : board.getConnectionsFrom(firstTo)) {
+                    int secondTo = secondEdge.getTo();
+                    Ticket secondTicket = secondEdge.getTicket();
+
+                    if (mrX.getTickets().has2Tickets(firstTicket, secondTicket)) {
+                        doubleMoves.add(new MrXDoubleMove(firstTo, firstTicket, secondTo, secondTicket));
+                    }
+                }
             }
             mrX.setPos(originalPos);
         }
         return doubleMoves;
-    }
-
-    public List<MrXDoubleMove> getAllowedDoubleMoves(String name){
-        Player p = players.get(name);
-        if(p instanceof MrX mrX){
-            return getPossibleDoubleMoves(mrX);
-        }
-        return Collections.emptyList();
     }
 
     public String getVisibleMrXPosition() {
@@ -289,8 +302,9 @@ public class GameState {
 
     public List<String> getMrXMoveHistory() {
         List<String> history = new ArrayList<>();
+        int currentRound = roundManager.getCurrentRound();
 
-        for (int i = 1; i <= currentRound - 1; i++) {
+        for (int i = 1; i < currentRound; i++) {
             MrXMove move = mrXHistory.get(i);
             if (move == null) continue;
 
@@ -302,6 +316,7 @@ public class GameState {
 
         return history;
     }
+
 
 }
 

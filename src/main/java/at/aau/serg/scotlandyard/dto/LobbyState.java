@@ -14,6 +14,7 @@ public class LobbyState {
     private boolean isStarted;
     private int maxPlayers;
     private int currentPlayerCount;
+    private Map<String, Integer> avatars;
 
     public LobbyState(String gameId,
                       List<String> players,
@@ -21,7 +22,7 @@ public class LobbyState {
                       Map<String, String> selectedRoles,
                       boolean isPublic,
                       boolean isStarted,
-                      int maxPlayers) {
+                      int maxPlayers, Map<String, Integer> avatars) {
         this.gameId = gameId;
         this.players = players;
         this.readyStatus = readyStatus;
@@ -30,6 +31,8 @@ public class LobbyState {
         this.maxPlayers = maxPlayers;
         this.currentPlayerCount = players.size();
         this.selectedRoles = selectedRoles;
+        this.avatars = avatars;
+
     }
 
     // Getter & Setter
@@ -95,5 +98,6 @@ public class LobbyState {
     public Map<String, String> getSelectedRoles() {
         return selectedRoles;
     }
+    public Map<String, Integer> getAvatars() { return avatars; }
 
 }

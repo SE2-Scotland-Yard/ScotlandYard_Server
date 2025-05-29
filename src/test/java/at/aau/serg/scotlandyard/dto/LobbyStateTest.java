@@ -17,10 +17,11 @@ class LobbyStateTest {
     private final boolean isPublic = true;
     private final boolean isStarted = false;
     private final int maxPlayers = 4;
+    private final Map<String, Integer> avatars = Map.of("Player1", 1, "Player2", 2);
 
     @BeforeEach
     void setUp() {
-        lobbyState = new LobbyState(gameId, players, readyStatus, selectedRoles, isPublic, isStarted, maxPlayers);
+        lobbyState = new LobbyState(gameId, players, readyStatus, selectedRoles, isPublic, isStarted, maxPlayers,avatars);
     }
 
     // --- Game ID ---

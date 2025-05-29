@@ -92,7 +92,7 @@ public class GameController {
             response.put(MESSAGE, "Ungültiger Zug!");
             return response;
         }
-        if (game.getWinner(gameId) != GameState.Winner.NONE) {
+        if (game.getWinner() != GameState.Winner.NONE) {
             response.put(MESSAGE, getWinner(gameId));
             return response;
         }
@@ -139,7 +139,7 @@ public class GameController {
         }
 
         // 5. Gewinner prüfen
-        if (game.getWinner(gameId) != GameState.Winner.NONE) {
+        if (game.getWinner() != GameState.Winner.NONE) {
             response.put(MESSAGE, getWinner(gameId));
             gameManager.removeGame(gameId);
             return response;
@@ -234,7 +234,7 @@ public class GameController {
     public String getWinner(@RequestParam String gameId) {
         GameState game = gameManager.getGame(gameId);
         if (game == null) return GAME_NOT_FOUND;
-        switch (game.getWinner(gameId)) {
+        switch (game.getWinner()) {
             case MR_X:
                 return "Mr.X hat gewonnen!";
             case DETECTIVE:

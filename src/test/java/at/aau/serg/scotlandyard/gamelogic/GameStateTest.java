@@ -123,10 +123,30 @@ class GameStateTest {
 
 
     @Test
+    void testMoveMrXDouble() {
+        gameState.moveMrXDouble("MrX",1,Ticket.TAXI,2,Ticket.TAXI);
+        assertEquals(2, gameState.getMrXMoveHistory().size());
+    }
+
+    @Test
     void testMoveMrXDoubleInvalid() {
         boolean successful = gameState.moveMrXDouble("Detective", 1, Ticket.TAXI, 1, Ticket.TAXI);
         assertFalse(successful);
         verify(mrX, never()).move(anyInt(), any(), any());
+    }
+
+    @Test
+    void testGetVisibleMrXPosition() {
+        //get to revealRound
+        when(mrX.isValidMove(anyInt(), any(), any())).thenReturn(true);
+        gameState.movePlayer("MrX", 1, Ticket.TAXI);
+        gameState.movePlayer("MrX", 8, Ticket.TAXI);
+        gameState.movePlayer("MrX", 19, Ticket.TAXI);
+
+        //test correct String
+        when(mrX.getPosition()).thenReturn(19);
+        assertEquals("19", gameState.getVisibleMrXPosition());
+
     }
 
     @Test
@@ -156,6 +176,22 @@ class GameStateTest {
     }
 
     @Test
+    void testGetMrXMoveHistoryInvalid() throws Exception {//spielt 1 Runde, setzt diese aber auf null
+        HashMap<Integer, MrXMove> mrXMoveHistory = new HashMap<>();
+        mrXMoveHistory.put(1, null);
+
+        when(mrX.isValidMove(anyInt(), any(Ticket.class), any(Board.class))).thenReturn(true);
+        gameState.movePlayer("MrX", 1, Ticket.TAXI);
+
+        Field nameField = GameState.class.getDeclaredField("mrXHistory");
+        nameField.setAccessible(true);
+        nameField.set(gameState, mrXMoveHistory);
+
+
+        assertEquals(new ArrayList<>(), gameState.getMrXMoveHistory());
+    }
+
+    @Test
     void testGetWinnerNone() throws Exception {
         RoundManager roundManager = mock(RoundManager.class);
         when(roundManager.isGameOver()).thenReturn(false);
@@ -164,7 +200,7 @@ class GameStateTest {
         nameField.setAccessible(true);
         nameField.set(gameState, roundManager);
 
-        assertEquals(GameState.Winner.NONE, gameState.getWinner("123"));
+        assertEquals(GameState.Winner.NONE, gameState.getWinner());
     }
 
     @Test
@@ -177,7 +213,7 @@ class GameStateTest {
         nameField.setAccessible(true);
         nameField.set(gameState, roundManager);
 
-        assertEquals(GameState.Winner.DETECTIVE, gameState.getWinner("123"));
+        assertEquals(GameState.Winner.DETECTIVE, gameState.getWinner());
     }
 
     @Test
@@ -190,7 +226,7 @@ class GameStateTest {
         nameField.setAccessible(true);
         nameField.set(gameState, roundManager);
 
-        assertEquals(GameState.Winner.MR_X, gameState.getWinner("123"));
+        assertEquals(GameState.Winner.MR_X, gameState.getWinner());
     }
 
     @Test
@@ -211,4 +247,78 @@ class GameStateTest {
         assertTrue(gameState.isPositionOccupied(5));
         assertFalse(gameState.isPositionOccupied(10));
     }
+
+    @Test
+    void testGetMrXPosition() {
+        when(mrX.getPosition()).thenReturn(1);
+        int pos = gameState.getMrXPosition("MrX");
+        assertEquals(1, pos);
+    }
+
+    @Test
+    void testGetMrXPositionNull() {
+        int pos = gameState.getMrXPosition("Nothing");
+        assertEquals(0, pos);
+    }
+
+    @Test
+    void testGetAllowedDoubleMovesNotAllowed() {
+        assertEquals(0, gameState.getAllowedDoubleMoves("Detective").size());
+    }
+
+    @Test
+    void testGetAllowedDoubleMovesPos1Taxi() {
+        when(mrX.getPosition()).thenReturn(1);
+
+        Map<Ticket, Integer> initialTickets = new EnumMap<>(Ticket.class);
+        initialTickets.put(Ticket.TAXI, 4);
+        initialTickets.put(Ticket.DOUBLE, 1);
+
+        when(mrX.getTickets()).thenReturn(new PlayerTickets(initialTickets));
+
+        assertEquals(6, gameState.getAllowedDoubleMoves("MrX").size());
+    }
+
+    @Test
+    void testGetAllowedDoubleMovesMissing2ndTicket() {
+        when(mrX.getPosition()).thenReturn(1);
+        Map<Ticket, Integer> initialTickets = new EnumMap<>(Ticket.class);
+        initialTickets.put(Ticket.TAXI, 1);
+        initialTickets.put(Ticket.DOUBLE, 1);
+
+        when(mrX.getTickets()).thenReturn(new PlayerTickets(initialTickets));
+        assertEquals(0, gameState.getAllowedDoubleMoves("MrX").size());
+    }
+
+    @Test
+    void testGetAllowedDoubleMovesMissingDoubleTicket() {
+        Map<Ticket, Integer> initialTickets = new EnumMap<>(Ticket.class);
+        initialTickets.put(Ticket.TAXI, 4);
+        initialTickets.put(Ticket.DOUBLE, 0);
+
+        when(mrX.getTickets()).thenReturn(new PlayerTickets(initialTickets));
+
+        assertEquals(0, gameState.getAllowedDoubleMoves("MrX").size());
+    }
+
+    @Test
+    void testGetCurrentPlayerNameNull() throws Exception {
+        Field nameField = GameState.class.getDeclaredField("roundManager");
+        nameField.setAccessible(true);
+        nameField.set(gameState, null);
+        assertNull(gameState.getCurrentPlayerName());
+    }
+
+    @Test
+    void testGetCurrentPlayerNameNoPlayer() throws Exception {
+        RoundManager roundManager = mock(RoundManager.class);
+        when(roundManager.getCurrentPlayer()).thenReturn(null);
+
+        Field nameField = GameState.class.getDeclaredField("roundManager");
+        nameField.setAccessible(true);
+        nameField.set(gameState, roundManager);
+        assertNull(gameState.getCurrentPlayerName());
+
+    }
+
 }
