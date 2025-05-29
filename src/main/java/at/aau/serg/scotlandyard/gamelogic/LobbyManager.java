@@ -51,6 +51,19 @@ public class LobbyManager {
         return lobby;
     }
 
+    public void leaveLobby(String gameId, String playerId) {
+        Lobby lobby = lobbies.get(gameId);
+        if (lobby != null) {
+            lobby.removePlayer(playerId);
+
+            // Wenn die Lobby leer ist → löschen
+            if (lobby.getPlayers().isEmpty()) {
+                lobbies.remove(gameId);
+            }
+        }
+    }
+
+
 
     private String generateGameId(int length) {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
