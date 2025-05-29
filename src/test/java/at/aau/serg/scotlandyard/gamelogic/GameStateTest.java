@@ -240,4 +240,46 @@ class GameStateTest {
         int pos = gameState.getMrXPosition("Nothing");
         assertEquals(0, pos);
     }
+
+    @Test
+    void testGetAllowedDoubleMovesNotAllowed() {
+        assertEquals(0, gameState.getAllowedDoubleMoves("Detective").size());
+    }
+
+    @Test
+    void testGetAllowedDoubleMovesPos1Taxi() {
+        when(mrX.getPosition()).thenReturn(1);
+
+        Map<Ticket, Integer> initialTickets = new EnumMap<>(Ticket.class);
+        initialTickets.put(Ticket.TAXI, 4);
+        initialTickets.put(Ticket.DOUBLE, 1);
+
+        when(mrX.getTickets()).thenReturn(new PlayerTickets(initialTickets));
+
+        assertEquals(6, gameState.getAllowedDoubleMoves("MrX").size());
+    }
+
+    @Test
+    void testGetAllowedDoubleMovesMissing2ndTicket() {
+        when(mrX.getPosition()).thenReturn(1);
+        Map<Ticket, Integer> initialTickets = new EnumMap<>(Ticket.class);
+        initialTickets.put(Ticket.TAXI, 1);
+        initialTickets.put(Ticket.DOUBLE, 1);
+
+        when(mrX.getTickets()).thenReturn(new PlayerTickets(initialTickets));
+        assertEquals(0, gameState.getAllowedDoubleMoves("MrX").size());
+    }
+
+    @Test
+    void testGetAllowedDoubleMovesMissingDoubleTicket() {
+        Map<Ticket, Integer> initialTickets = new EnumMap<>(Ticket.class);
+        initialTickets.put(Ticket.TAXI, 4);
+        initialTickets.put(Ticket.DOUBLE, 0);
+
+        when(mrX.getTickets()).thenReturn(new PlayerTickets(initialTickets));
+
+        assertEquals(0, gameState.getAllowedDoubleMoves("MrX").size());
+    }
+
+
 }
