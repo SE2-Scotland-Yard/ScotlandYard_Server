@@ -94,8 +94,7 @@ public class RoundManager {
     }
     public void gameOver(String gameId) {
         logger.info("Game {} is over",gameId);
-        gameManager.getGame(gameId);
-        gameManager.removeGame(gameId);
+
     }
 
     public void addMrXTicket(Ticket ticket){

@@ -145,6 +145,7 @@ public class GameController {
         // 5. Gewinner prüfen
         if (game.getWinner(gameId) != GameState.Winner.NONE) {
             response.put(MESSAGE, getWinner(gameId));
+            gameManager.removeGame(gameId);
             return response;
         }
 
