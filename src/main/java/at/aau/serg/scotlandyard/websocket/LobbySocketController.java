@@ -71,7 +71,7 @@ public class LobbySocketController {
             String sanitizedGameId = gameId.replaceAll("[\\n\\r\\t]", "_");
             logger.info("Sending GameUpdate to /topic/game/{}", sanitizedGameId);
             logger.info("Aktueller Spieler im Mapper: {}", game.getCurrentPlayerName());
-            messaging.convertAndSend("/topic/game/" + gameId, GameMapper.mapToGameUpdate(gameId, game.getRoundManager().getPlayerPositions(), game.getCurrentPlayerName()));//positionen
+            messaging.convertAndSend("/topic/game/" + gameId, GameMapper.mapToGameUpdate(gameId, game.getRoundManager().getPlayerPositions(), game.getCurrentPlayerName(), "NONE"));//positionen
 
         }
 

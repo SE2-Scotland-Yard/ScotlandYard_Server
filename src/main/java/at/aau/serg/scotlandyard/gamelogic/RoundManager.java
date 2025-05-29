@@ -77,10 +77,13 @@ public class RoundManager {
     public boolean isMrXCaptured(){
         for(Detective detective : detectives){
             if(detective.getPosition() == mrX.getPosition()){
+
                 return true;
             }
         }
+
         return false;
+
     }
 
     public boolean isGameOver(){

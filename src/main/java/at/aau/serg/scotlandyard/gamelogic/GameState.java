@@ -3,6 +3,7 @@ package at.aau.serg.scotlandyard.gamelogic;
 
 import at.aau.serg.scotlandyard.dto.GameMapper;
 
+import at.aau.serg.scotlandyard.dto.GameUpdate;
 import at.aau.serg.scotlandyard.gamelogic.board.Board;
 import at.aau.serg.scotlandyard.gamelogic.board.Edge;
 import at.aau.serg.scotlandyard.gamelogic.player.Detective;
@@ -103,7 +104,8 @@ public class GameState {
                     GameMapper.mapToGameUpdate(
                             gameId,
                             playerPositions,
-                            getCurrentPlayerName()
+                            getCurrentPlayerName(),
+                            getWinner().toString()
                     )
             );
             return true;
@@ -123,12 +125,13 @@ public class GameState {
             playerPositions = roundManager.getPlayerPositions();
 
             String nextPlayer = getCurrentPlayerName();
-            logger.info("➡️ currentRound: {}, nextPlayer: {}", currentRound, nextPlayer);
+            logger.info("➡️ currentRound: {}, nextPlayer: {}, WINNER: {}", currentRound, nextPlayer,getWinner().toString());
             messaging.convertAndSend("/topic/game/" + gameId,
                     GameMapper.mapToGameUpdate(
                             gameId,
                             playerPositions,
-                            getCurrentPlayerName()
+                            getCurrentPlayerName(),
+                            getWinner().toString()
                     )
             );
                 return true;
@@ -144,11 +147,13 @@ public class GameState {
 
             String nextPlayer = getCurrentPlayerName();
             logger.info("➡️ currentRound: {}, nextPlayer: {}", currentRound, nextPlayer);
+            logger.info("WINNER: {}", getWinner().toString());
             messaging.convertAndSend("/topic/game/" + gameId,
                     GameMapper.mapToGameUpdate(
                             gameId,
                             playerPositions,
-                            getCurrentPlayerName()
+                            getCurrentPlayerName(),
+                            getWinner().toString()
                     )
             );
             return true;
