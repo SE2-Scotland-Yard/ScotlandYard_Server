@@ -64,7 +64,7 @@ public class GameController {
         return ResponseEntity.ok(allowedMoves);
     }
 
-    @PostMapping("/blackTicket")
+    @PostMapping("/blackMove")
     public Map<String, String> blackTicket(
             @RequestParam String gameId,
             @RequestParam String name,
@@ -79,23 +79,19 @@ public class GameController {
             response.put(MESSAGE, "Ungültiges Ticket: " + gotTicket);
             return response;
         }
-
         GameState game = gameManager.getGame(gameId);
         if (game == null) {
             response.put(MESSAGE, "Spiel nicht gefunden!");
             return response;
         }
-
         if (!game.getAllPlayers().containsKey(name)) {
             response.put(MESSAGE, "Spieler " + name + " existiert nicht!");
             return response;
         }
-
         if (!game.moveBlackTicket(name, to, ticket)) {
             response.put(MESSAGE, "Ungültiger Zug!");
             return response;
         }
-
         if (game.getWinner(gameId) != GameState.Winner.NONE) {
             response.put(MESSAGE, getWinner(gameId));
             return response;
