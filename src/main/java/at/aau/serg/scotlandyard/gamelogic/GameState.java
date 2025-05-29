@@ -199,39 +199,38 @@ public class GameState {
         return false;
     }
 
-    public List<MrXDoubleMove> getPossibleDoubleMoves(MrX mrX){
+    public List<MrXDoubleMove> getAllowedDoubleMoves(String name){
+        Player p = players.get(name);
+        if (!(p instanceof MrX mrX)) {
+            return Collections.emptyList();
+        }
         List<MrXDoubleMove> doubleMoves = new ArrayList<>();
-
-
 
         if (!mrX.getTickets().hasTicket(Ticket.DOUBLE)) return doubleMoves;
 
         int originalPos = mrX.getPosition();
 
         //Erster möglicher Zug
-        for(Edge firstEdge : board.getConnectionsFrom(originalPos)){
+        for (Edge firstEdge : board.getConnectionsFrom(originalPos)) {
             int firstTo = firstEdge.getTo();
             Ticket firstTicket = firstEdge.getTicket();
 
             mrX.setPos(firstTo);
             //Zweiter möglicher Zug
-            for(Edge secondEdge : board.getConnectionsFrom(firstTo)){
-                int secondTo = secondEdge.getTo();
-                Ticket secondTicket = secondEdge.getTicket();
+            if (mrX.getTickets().hasTicket(firstTicket)) {
 
-                doubleMoves.add(new MrXDoubleMove(firstTo, firstTicket, secondTo, secondTicket));
+                for (Edge secondEdge : board.getConnectionsFrom(firstTo)) {
+                    int secondTo = secondEdge.getTo();
+                    Ticket secondTicket = secondEdge.getTicket();
+
+                    if (mrX.getTickets().has2Tickets(firstTicket, secondTicket)) {
+                        doubleMoves.add(new MrXDoubleMove(firstTo, firstTicket, secondTo, secondTicket));
+                    }
+                }
             }
             mrX.setPos(originalPos);
         }
         return doubleMoves;
-    }
-
-    public List<MrXDoubleMove> getAllowedDoubleMoves(String name){
-        Player p = players.get(name);
-        if(p instanceof MrX mrX){
-            return getPossibleDoubleMoves(mrX);
-        }
-        return Collections.emptyList();
     }
 
     public String getVisibleMrXPosition() {
