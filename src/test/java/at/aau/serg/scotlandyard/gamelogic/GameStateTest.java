@@ -211,4 +211,17 @@ class GameStateTest {
         assertTrue(gameState.isPositionOccupied(5));
         assertFalse(gameState.isPositionOccupied(10));
     }
+
+    @Test
+    void testGetMrXPosition() {
+        when(mrX.getPosition()).thenReturn(1);
+        int pos = gameState.getMrXPosition("MrX");
+        assertEquals(1, pos);
+    }
+
+    @Test
+    void testGetMrXPositionNull() {
+        int pos = gameState.getMrXPosition("Nothing");
+        assertEquals(0, pos);
+    }
 }
