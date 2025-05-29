@@ -97,16 +97,16 @@ class PlayerMovementTest {
         assertFalse(moved);
     }
 
-//    @Test
-//    void testVisibleMrXPosition_ShouldReturnPositionOnRevealRound() {
-//        GameState game = new GameState("1234", messagingTemplate);
-//        MrX mrX = new MrX("Maxmustermann");
-//
-//        moveMrXToRound(game, mrX, 3);
-//
-//        String visible = game.getVisibleMrXPosition();
-//        assertEquals(String.valueOf(mrX.getPosition()), visible);
-//    }
+    @Test
+    void testVisibleMrXPosition_ShouldReturnPositionOnRevealRound() {
+        GameState game = new GameState("1234", messagingTemplate);
+        MrX mrX = new MrX("Maxmustermann");
+
+        moveMrXToRound(game, mrX, 3);
+
+        String visible = game.getVisibleMrXPosition();
+        assertEquals(String.valueOf(mrX.getPosition()), visible);
+    }
 
     @Test
     void testInvisibleMrXPosition_ShouldReturnQuestionMark() {
@@ -132,27 +132,27 @@ class PlayerMovementTest {
         }
     }
 
-//    @Test
-//    void testMrXDoubleMove_ShouldExecuteTwoMovesAndStoreHistory() {
-//        GameState game = new GameState("1234", messagingTemplate);
-//        MrX mrX = new MrX("Maxmustermann");
-//        Detective det = new Detective("Dummy");
-//        game.addPlayer("X", mrX);
-//        game.addPlayer("D", det);
-//        game.initRoundManager(List.of(det), mrX);
-//
-//        int from = mrX.getPosition();
-//        Edge first = board.getConnectionsFrom(from).get(0);
-//        Edge second = board.getConnectionsFrom(first.getTo()).get(0);
-//
-//        boolean moved = game.moveMrXDouble("X",
-//                first.getTo(), first.getTicket(),
-//                second.getTo(), second.getTicket());
-//
-//        assertTrue(moved);
-//        assertEquals(second.getTo(), mrX.getPosition());
-//        assertEquals(2, game.getMrXMoveHistory().size());
-//    }
+    @Test
+    void testMrXDoubleMove_ShouldExecuteTwoMovesAndStoreHistory() {
+        GameState game = new GameState("1234", messagingTemplate);
+        MrX mrX = new MrX("Maxmustermann");
+        Detective det = new Detective("Dummy");
+        game.addPlayer("X", mrX);
+        game.addPlayer("D", det);
+        game.initRoundManager(List.of(det), mrX);
+
+        int from = mrX.getPosition();
+        Edge first = board.getConnectionsFrom(from).get(0);
+        Edge second = board.getConnectionsFrom(first.getTo()).get(0);
+
+        boolean moved = game.moveMrXDouble("X",
+                first.getTo(), first.getTicket(),
+                second.getTo(), second.getTicket());
+
+        assertTrue(moved);
+        assertEquals(second.getTo(), mrX.getPosition());
+        assertEquals(2, game.getMrXMoveHistory().size());
+    }
 
     private void moveMrXToRound(GameState game, MrX mrX, int targetRound) {
         Detective dummy = new Detective("D");
