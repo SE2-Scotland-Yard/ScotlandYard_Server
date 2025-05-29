@@ -132,7 +132,7 @@ class GameSocketControllerTest {
     @Test
     void testHandleWinner_MrX() {
         when(gameManager.getGame("g4")).thenReturn(gameState);
-        when(gameState.getWinner()).thenReturn(GameState.Winner.MR_X);
+        when(gameState.getWinner("123")).thenReturn(GameState.Winner.MR_X);
 
         controller.handleWinner("g4");
 
@@ -142,7 +142,7 @@ class GameSocketControllerTest {
     @Test
     void testHandleWinner_Detective() {
         when(gameManager.getGame("g5")).thenReturn(gameState);
-        when(gameState.getWinner()).thenReturn(GameState.Winner.DETECTIVE);
+        when(gameState.getWinner("123")).thenReturn(GameState.Winner.DETECTIVE);
 
         controller.handleWinner("g5");
 
@@ -152,7 +152,7 @@ class GameSocketControllerTest {
     @Test
     void testHandleWinner_None() {
         when(gameManager.getGame("g6")).thenReturn(gameState);
-        when(gameState.getWinner()).thenReturn(GameState.Winner.NONE);
+        when(gameState.getWinner("123")).thenReturn(GameState.Winner.NONE);
 
         controller.handleWinner("g6");
 
