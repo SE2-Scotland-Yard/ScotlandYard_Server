@@ -20,7 +20,7 @@ public class GameUpdate {
         this.playerPositions = playerPositions;
         this.currentPlayer = currentPlayer;
         this.winner = winner;
-      this.lastTicketUsed = lastTicketUsed;
+        this.lastTicketUsed = lastTicketUsed;
 
     }
 
@@ -38,9 +38,10 @@ public class GameUpdate {
     }
 
 
-    public  Ticket getLastTicketUsed(){
+    public  Ticket getLastTicketUsed() {
 
         return lastTicketUsed;
+    }
 
     public String getWinner() {
         return winner;

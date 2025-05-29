@@ -105,7 +105,8 @@ public class GameState {
                             gameId,
                             playerPositions,
                             getCurrentPlayerName(),
-                            getWinner(gameId).toString()
+                            getWinner(gameId).toString(),
+                            Ticket.BLACK
                     )
             );
             return true;
@@ -133,7 +134,7 @@ public class GameState {
                             gameId,
                             playerPositions,
                             getCurrentPlayerName(),
-                            winner
+                            winner,
                             ticket
 
                            
@@ -162,7 +163,7 @@ public class GameState {
                             gameId,
                             playerPositions,
                             getCurrentPlayerName(),
-                            winner
+                            winner,
                             ticket
 
                     )
