@@ -93,6 +93,7 @@ public class GameState {
             mrX.moveBlack(to, ticket, board);
             int roundBefore = roundManager.getCurrentRound();
             mrXHistory.put(roundBefore, new MrXMove(to, Ticket.BLACK));
+            roundManager.nextTurn();
 
 
             playerPositions = roundManager.getPlayerPositions();
