@@ -126,7 +126,8 @@ class GameSocketControllerTest {
 
         controller.handleWinner("g6");
 
-        verify(messaging).convertAndSend("/topic/game/g6/winner", "Spiel läuft noch.");
+        verify(messaging).convertAndSend("/topic/game/g6/winner", "Spiel lÃ¤uft noch.");
+
     }
 
     @Test

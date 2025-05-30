@@ -95,7 +95,10 @@ class GameControllerTest {
     @Test
     void move_WhenPlayerNotFound_ReturnsErrorMessage() {
         when(gameManager.getGame(gameId)).thenReturn(gameState);
-        when(gameState.getAllPlayers()).thenReturn(new HashMap<>());
+
+        Map<String, Player> players = new HashMap<>();
+        // Leere Map = Spieler nicht vorhanden
+        when(gameState.getAllPlayers()).thenReturn(players);
 
         Map<String, String> result = gameController.move(gameId, playerName, position, "TAXI");
 
@@ -159,7 +162,11 @@ class GameControllerTest {
     @Test
     void moveDouble_WhenInvalidMove_ReturnsErrorMessage() {
         when(gameManager.getGame(gameId)).thenReturn(gameState);
-        when(gameState.getAllPlayers()).thenReturn(Map.of(playerName, null));
+
+        Map<String, Player> players = new HashMap<>();
+        players.put(playerName, null); // Oder mock(Player.class)
+        when(gameState.getAllPlayers()).thenReturn(players);
+
         when(gameState.moveMrXDouble(playerName, 42, Ticket.TAXI, Ticket.BUS)).thenReturn(false);
 
         Map<String, String> response = gameController.moveDouble(
@@ -171,7 +178,12 @@ class GameControllerTest {
     @Test
     void moveDouble_WhenValidMove_ReturnsSuccessMessage() {
         when(gameManager.getGame(gameId)).thenReturn(gameState);
-        when(gameState.getAllPlayers()).thenReturn(Map.of(playerName, null));
+
+        Player mockPlayer = mock(Player.class);
+        Map<String, Player> players = new HashMap<>();
+        players.put(playerName, mockPlayer);
+        when(gameState.getAllPlayers()).thenReturn(players);
+
         when(gameState.moveMrXDouble(playerName, 42, Ticket.TAXI, Ticket.BUS)).thenReturn(true);
         when(gameState.getWinner()).thenReturn(GameState.Winner.NONE);
 
