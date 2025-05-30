@@ -61,6 +61,9 @@ public class GameController {
                 .map(entry -> Map.entry(entry.getKey(), entry.getValue().name())) // Ticket zu String konvertieren
                 .toList();
         logger.info("Allowed moves: {}",allowedMoves);
+        if(allowedMoves.isEmpty()) {
+            game.cantMove(gameId);
+        }
         return ResponseEntity.ok(allowedMoves);
     }
 
