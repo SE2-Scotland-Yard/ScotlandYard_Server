@@ -124,13 +124,13 @@ class GameStateTest {
 
     @Test
     void testMoveMrXDouble() {
-        gameState.moveMrXDouble("MrX",1,Ticket.TAXI,2,Ticket.TAXI);
+        gameState.moveMrXDouble("MrX",1,Ticket.TAXI,Ticket.TAXI);
         assertEquals(2, gameState.getMrXMoveHistory().size());
     }
 
     @Test
     void testMoveMrXDoubleInvalid() {
-        boolean successful = gameState.moveMrXDouble("Detective", 1, Ticket.TAXI, 1, Ticket.TAXI);
+        boolean successful = gameState.moveMrXDouble("Detective", 1, Ticket.TAXI, Ticket.TAXI);
         assertFalse(successful);
         verify(mrX, never()).move(anyInt(), any(), any());
     }
