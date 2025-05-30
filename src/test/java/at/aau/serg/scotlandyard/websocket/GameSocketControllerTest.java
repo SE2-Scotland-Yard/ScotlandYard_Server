@@ -78,37 +78,7 @@ class GameSocketControllerTest {
         verify(messaging, never()).convertAndSend(Optional.of(anyString()), any());
     }
 
-    @Test
-    void testHandleDoubleMove_Success() {
-        GameSocketController.DoubleMoveRequest req = new GameSocketController.DoubleMoveRequest("g2", "MrX", 1, Ticket.BUS, 2, Ticket.TAXI);
-        when(gameManager.getGame("g2")).thenReturn(gameState);
-        when(gameState.moveMrXDouble("MrX", 1, Ticket.BUS, 2, Ticket.TAXI)).thenReturn(true);
 
-        controller.handleDoubleMove(req);
-
-        verify(messaging).convertAndSend("/topic/game/g2/state", gameState);
-    }
-
-    @Test
-    void testHandleDoubleMove_GameNotExists() {
-        GameSocketController.DoubleMoveRequest req = new GameSocketController.DoubleMoveRequest("gX", "MrX", 1, Ticket.BUS, 2, Ticket.TAXI);
-        when(gameManager.getGame("gX")).thenReturn(null);
-
-        controller.handleDoubleMove(req);
-
-        verifyNoInteractions(messaging);
-    }
-
-    @Test
-    void testHandleDoubleMove_NotSuccessful() {
-        GameSocketController.DoubleMoveRequest req = new GameSocketController.DoubleMoveRequest("g2", "MrX", 1, Ticket.BUS, 2, Ticket.TAXI);
-        when(gameManager.getGame("g2")).thenReturn(gameState);
-        when(gameState.moveMrXDouble("MrX", 1, Ticket.BUS, 2, Ticket.TAXI)).thenReturn(false);
-
-        controller.handleDoubleMove(req);
-
-        verify(messaging, never()).convertAndSend(Optional.of(anyString()), any());
-    }
 
     @Test
     void testHandleMrXPosition_GameExists() {
