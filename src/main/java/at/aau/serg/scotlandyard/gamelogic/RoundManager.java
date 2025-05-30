@@ -15,13 +15,16 @@ import java.util.*;
 public class RoundManager {
     @Getter
     private final List<Detective>detectives;
+    @Getter
     private final MrX mrX;
     private int mrXPosition;
+    @Getter
     private final List<Player>turnOrder;
 
     private Map<String,Integer> currentplayerPosition = new HashMap<>();
 
     private int currentPlayerTurn = 0; //index that indicates which player is next
+    @Getter
     private int currentRound = 1;
     private static final int MAXROUNDS = 24;
 
@@ -63,7 +66,23 @@ public class RoundManager {
         logger.info("Current Player Positions: {}", currentplayerPosition);
         return currentplayerPosition;
     }
+    public void nextRound() {
+        for(Player p : turnOrder){
+            if(p instanceof MrX){
+                if(revealRounds.contains(currentRound)){
+                    mrXPosition=p.getPosition();
 
+                }
+                if(currentRound>=3) {
+                    currentplayerPosition.put(p.getName(), mrXPosition);
+                }
+            }
+
+
+        }
+
+        currentRound++;
+    }
     public void nextTurn(){
         currentPlayerTurn++;
         logger.info("Current Turn: {}", currentRound);
@@ -99,19 +118,6 @@ public class RoundManager {
 
     public void addMrXTicket(Ticket ticket){
         mrX.addTicket(ticket);
-    }
-
-    public int getCurrentRound() {
-        return currentRound;
-    }
-
-
-    public MrX getMrX(){
-        return mrX;
-    }
-
-    public List<Player> getTurnOrder() {
-        return turnOrder;
     }
 
 

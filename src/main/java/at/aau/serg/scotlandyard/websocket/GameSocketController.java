@@ -45,20 +45,7 @@ public class GameSocketController {
     }
 
 
-    @MessageMapping("/game/moveDouble")
-    public void handleDoubleMove(DoubleMoveRequest request) {
-        GameState game = gameManager.getGame(request.gameId());
-        if (game == null) return;
 
-        boolean success = game.moveMrXDouble(
-                request.playerName(),
-                request.firstTarget(), request.firstTicket(),
-                request.secondTarget(), request.secondTicket()
-        );
-        if (success) {
-            messaging.convertAndSend(TOPIC_GAME_LITERAL + request.gameId() + "/state", game);
-        }
-    }
 
 
     @MessageMapping("/game/mrXPosition")
