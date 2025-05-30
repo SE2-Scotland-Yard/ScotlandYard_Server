@@ -43,24 +43,6 @@ public class GameSocketController {
             messaging.convertAndSend(TOPIC_GAME_LITERAL + request.gameId() + "/state", game);
         }
     }
-
-
-    @MessageMapping("/game/moveDouble")
-    public void handleDoubleMove(DoubleMoveRequest request) {
-        GameState game = gameManager.getGame(request.gameId());
-        if (game == null) return;
-
-        boolean success = game.moveMrXDouble(
-                request.playerName(),
-                request.firstTarget(), request.firstTicket(),
-                request.secondTarget(), request.secondTicket()
-        );
-        if (success) {
-            messaging.convertAndSend(TOPIC_GAME_LITERAL + request.gameId() + "/state", game);
-        }
-    }
-
-
     @MessageMapping("/game/mrXPosition")
     public void handleMrXPosition(String gameId) {
         GameState game = gameManager.getGame(gameId);
@@ -79,12 +61,12 @@ public class GameSocketController {
         String winner = switch (game.getWinner()) {
             case MR_X -> "Mr.X hat gewonnen!";
             case DETECTIVE -> "Detektive haben gewonnen!";
-            default -> "Spiel läuft noch.";
+            default -> "Spiel lÃ¤uft noch.";
         };
         messaging.convertAndSend(TOPIC_GAME_LITERAL + gameId + "/winner", winner);
     }
 
-  
+
     public record MoveRequest(String gameId, String playerName, int target, Ticket ticket) {}
     public record DoubleMoveRequest(String gameId, String playerName, int firstTarget, Ticket firstTicket, int secondTarget, Ticket secondTicket) {}
 }
