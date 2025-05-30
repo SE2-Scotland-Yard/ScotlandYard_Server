@@ -60,8 +60,8 @@ public class GameController {
         List<Map.Entry<Integer, String>> allowedMoves = game.getAllowedMoves(name).stream()
                 .map(entry -> Map.entry(entry.getKey(), entry.getValue().name())) // Ticket zu String konvertieren
                 .toList();
-        logger.info("Allowed moves: {}",allowedMoves);
-        if(allowedMoves.isEmpty()) {
+        logger.info("Allowed moves: {}", allowedMoves);
+        if (allowedMoves.isEmpty()) {
             game.cantMove(gameId);
         }
         return ResponseEntity.ok(allowedMoves);
@@ -73,7 +73,7 @@ public class GameController {
             @RequestParam String name,
             @RequestParam int to,
             @RequestParam String gotTicket
-    ){
+    ) {
         Map<String, String> response = new HashMap<>();
         Ticket ticket;
         try {
@@ -153,36 +153,60 @@ public class GameController {
     }
 
     @PostMapping("/moveDouble")
-    public ResponseEntity<Map<String, Object>> moveDouble(@RequestParam String gameId,
-                                                          @RequestParam String name,
-                                                          @RequestParam int firstTo,
-                                                          @RequestParam Ticket firstTicket,
-                                                          @RequestParam int secondTo,
-                                                          @RequestParam Ticket secondTicket) {
-        Map<String, Object> response = new HashMap<>();
+    public Map<String, String> moveDouble(
+            @RequestParam String gameId,
+            @RequestParam String name,
+            @RequestParam int to,
+            @RequestParam String gotTicket
+    ) {
+
+        Map<String, String> response = new HashMap<>();
+        Ticket ticket1 = null;
+        Ticket ticket2 = null;
+        String[] ticketsArray = gotTicket.split("\\+");
+
+        if (ticketsArray.length == 2) {
+            String ticketType1 = ticketsArray[0];
+            String ticketType2 = ticketsArray[1];
+            try {
+                ticket1 = Ticket.valueOf(ticketType1);
+                ticket2 = Ticket.valueOf(ticketType2);
+            } catch (IllegalArgumentException e) {
+                response.put(MESSAGE, "Ungültiges Ticket: " + gotTicket);
+                return response;
+            }
+        } else {
+            response.put(MESSAGE, "ERROR, falsches Ticket Format");
+
+        }
+
         GameState game = gameManager.getGame(gameId);
         if (game == null) {
-            response.put("status", "error");
-            response.put("message", "Spiel nicht gefunden!");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            response.put(MESSAGE, "Spiel nicht gefunden!");
+            return response;
+        }
+        if (!game.getAllPlayers().containsKey(name)) {
+            response.put(MESSAGE, "Spieler " + name + " existiert nicht!");
+            return response;
+        }
+        if (!game.moveMrXDouble(name, to, ticket1, ticket2)) {
+            response.put(MESSAGE, "Ungültiger Zug!");
+            return response;
+        }
+        if (game.getWinner() != GameState.Winner.NONE) {
+            response.put(MESSAGE, getWinner(gameId));
+            return response;
         }
 
-        if (!game.moveMrXDouble(name, firstTo, firstTicket, secondTo, secondTicket)) {
-            response.put("status", "error");
-            response.put("message", "Ungültiger Doppelzug!");
-            return ResponseEntity.badRequest().body(response);
-        }
-
-        response.put("status", "success");
-        response.put("message", "MrX machte einen Doppelzug: " + firstTo + " → " + secondTo);
-        return ResponseEntity.ok(response);
+        response.put(MESSAGE, "Spieler " + name + " bewegt sich zu " + to + " in Spiel " + gameId);
+        return response;
     }
 
     @GetMapping("/allowedDoubleMoves")
     public ResponseEntity<?> getDoubleMoves(
             @RequestParam String gameId,
             @RequestParam String name
-    ){
+    ) {
         GameState game = gameManager.getGame(gameId);
 
         if (game == null) {
@@ -190,21 +214,15 @@ public class GameController {
                     .body("Game mit ID '" + gameId + "' nicht gefunden.");
         }
 
-        List<MrXDoubleMove> doubleMoves = game.getAllowedDoubleMoves(name);
+        List<Map.Entry<Integer, String>> doubleMoves = game.getAllowedDoubleMoves(name).stream()
+                .map(entry -> Map.entry(entry.getKey(), entry.getValue())) // Bereits in String-Form
+                .toList();
+        logger.info("Allowed double moves: {}", doubleMoves);
 
-        List<Map<String, Object>> response = doubleMoves.stream().map(move -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("firstTo", move.getFirstMove());
-            map.put("firstTicket", move.getFirstTicket().name());
-            map.put("secondTo", move.getSecondMove());
-            map.put("secondTicket", move.getSecondTicket().name());
-            return map;
-        }).toList();
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(doubleMoves);
 
     }
-
 
 
     @GetMapping("/mrXposition")
