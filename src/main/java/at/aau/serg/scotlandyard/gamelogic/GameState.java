@@ -45,17 +45,17 @@ public class GameState {
         this.roundManager = new RoundManager(detectives, mrX);
     }
 
-    public boolean canMove(String playerName, int target, Ticket ticket) {
-        Player player = players.get(playerName);
-        if (player == null) {
-            return false;
-        }
-        boolean isTargetReachable = getAllowedMoves(playerName).stream()
-                .anyMatch(entry -> entry.getKey() == target && entry.getValue() == ticket);
-
-        return isTargetReachable
-                && player.getTickets().hasTicket(ticket)
-                && (player instanceof MrX || !isPositionOccupied(target));
+    public void cantMove(String gameId) {
+        roundManager.nextTurn();
+        messaging.convertAndSend("/topic/game/" + gameId,
+                GameMapper.mapToGameUpdate(
+                        gameId,
+                        playerPositions,
+                        getCurrentPlayerName(),
+                        getWinner().toString(),
+                        Ticket.BLACK
+                )
+        );
     }
     public void addPlayer(String name, Player player) {
         players.put(name, player);
