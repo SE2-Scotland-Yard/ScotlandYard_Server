@@ -53,7 +53,7 @@ public class GameState {
                         playerPositions,
                         getCurrentPlayerName(),
                         getWinner().toString(),
-                        Ticket.BLACK
+                        null
                 )
         );
     }
