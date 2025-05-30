@@ -177,6 +177,19 @@ public class LobbySocketController {
         }
     }
 
+    @MessageMapping("/lobby/ping")
+    public void handlePing(Map<String, String> payload) {
+        String gameId = payload.get("gameId");
+        String playerId = payload.get("playerId");
+
+        Lobby lobby = lobbyManager.getLobby(gameId);
+        if (lobby != null) {
+            lobby.updateLastActivity(playerId);
+            System.out.println("→ Ping erhalten von " + playerId);
+        }
+    }
+
+
 
 
 

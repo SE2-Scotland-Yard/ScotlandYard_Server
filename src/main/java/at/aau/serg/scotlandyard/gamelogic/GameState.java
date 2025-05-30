@@ -91,9 +91,10 @@ public class GameState {
         Player p = players.get(name);
         if (p instanceof MrX mrX && mrX.isValidMove(to, ticket, board)) {
             mrX.moveBlack(to, ticket, board);
-            mrXHistory.put(currentRound, new MrXMove(to, ticket));
-            currentRound++;
+            int roundBefore = roundManager.getCurrentRound();
+            mrXHistory.put(roundBefore, new MrXMove(to, Ticket.BLACK));
             roundManager.nextTurn();
+
 
             playerPositions = roundManager.getPlayerPositions();
 
