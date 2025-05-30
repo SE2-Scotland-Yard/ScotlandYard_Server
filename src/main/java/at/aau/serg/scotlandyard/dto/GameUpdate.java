@@ -2,6 +2,7 @@ package at.aau.serg.scotlandyard.dto;
 
 
 
+import at.aau.serg.scotlandyard.gamelogic.player.Player;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.Ticket;
 
 import at.aau.serg.scotlandyard.gamelogic.GameState;
@@ -14,14 +15,16 @@ public class GameUpdate {
     private String currentPlayer;
     private String winner;
     private Ticket lastTicketUsed;
+    private Map<String, Map<Ticket, Integer>> ticketInventory;
 
-    public GameUpdate(String gameId, Map<String, Integer> playerPositions, String currentPlayer, String winner,Ticket lastTicketUsed) {
+
+    public GameUpdate(String gameId, Map<String, Integer> playerPositions, String currentPlayer, String winner, Ticket lastTicketUsed, Map<String, Map<Ticket, Integer>> ticketInventory) {
         this.gameId = gameId;
         this.playerPositions = playerPositions;
         this.currentPlayer = currentPlayer;
         this.winner = winner;
         this.lastTicketUsed = lastTicketUsed;
-
+        this.ticketInventory = ticketInventory;
     }
 
     public String getGameId() {
@@ -46,6 +49,10 @@ public class GameUpdate {
     public String getWinner() {
         return winner;
 
+    }
+
+    public Map<String, Map<Ticket, Integer>> getTicketInventory() {
+        return ticketInventory;
     }
 }
 

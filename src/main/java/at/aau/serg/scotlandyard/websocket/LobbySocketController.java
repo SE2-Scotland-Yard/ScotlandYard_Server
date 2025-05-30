@@ -91,15 +91,23 @@ public class LobbySocketController {
         if (!detectives.isEmpty()) {
             game.initRoundManager(detectives, mrX); // RoundManager korrekt initialisieren
 
-
             String sanitizedGameId = gameId.replaceAll("[\\n\\r\\t]", "_");
             logger.info("Sending GameUpdate to /topic/game/{}", sanitizedGameId);
             logger.info("Aktueller Spieler im Mapper: {}", game.getCurrentPlayerName());
 
-            messaging.convertAndSend("/topic/game/" + gameId, GameMapper.mapToGameUpdate(gameId, game.getRoundManager().getPlayerPositions(), game.getCurrentPlayerName(), "NONE", null));//positionen
-
-
+            messaging.convertAndSend(
+                    "/topic/game/" + gameId,
+                    GameMapper.mapToGameUpdate(
+                            gameId,
+                            game.getRoundManager().getPlayerPositions(),
+                            game.getCurrentPlayerName(),
+                            "NONE",
+                            null,
+                            game.getAllPlayers()
+                    )
+            );
         }
+
 
         return game;
     }

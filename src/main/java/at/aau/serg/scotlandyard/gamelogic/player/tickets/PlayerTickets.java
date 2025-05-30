@@ -38,6 +38,11 @@ public class PlayerTickets {
     public int getTicketCount(Ticket ticket) {
         return tickets.getOrDefault(ticket, 0);
     }
+
+    public Map<Ticket, Integer> getTicketMap() {
+        return Map.copyOf(tickets); // unveränderlich
+    }
+
 }
 
 
