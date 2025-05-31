@@ -227,18 +227,19 @@ public class GameState {
                 .anyMatch(p -> p.getPosition() == position);
     }
 
-    public boolean moveMrXDouble(String name, int to, Ticket ticket1, Ticket ticket2) {
+    public boolean moveMrXDouble(String name, int toFirst,int to, Ticket ticket1, Ticket ticket2) {
         Player p = players.get(name);
         if (p instanceof MrX mrX) {
             try {
 
                 int round = roundManager.getCurrentRound();
+                mrX.move(toFirst,ticket1,board);
+                //mrX.moveDouble(to, ticket1, ticket2, board);
 
-                mrX.moveDouble(to, ticket1, ticket2, board);
-
-                mrXHistory.put(round, new MrXMove(to, ticket1));
+                mrXHistory.put(round, new MrXMove(toFirst, ticket1));
                 roundManager.nextRound();
                 round = roundManager.getCurrentRound();
+                mrX.move(to,ticket2,board);
                 mrXHistory.put(round, new MrXMove(to, ticket2));
                 roundManager.nextTurn();
 
@@ -297,7 +298,7 @@ public class GameState {
                     }
 
                     if (secondMove.getTo() != currentPos) {
-                        String combinedTickets = firstMove.getTicket() + "+" + secondMove.getTicket();
+                        String combinedTickets = firstMove.getTicket() + "+" + secondMove.getTicket()+"+" + firstMove.getTo();
                         result.add(Map.entry(secondMove.getTo(), combinedTickets));
                     }
                 }
