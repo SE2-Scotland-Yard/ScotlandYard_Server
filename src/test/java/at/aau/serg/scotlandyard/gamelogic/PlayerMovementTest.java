@@ -137,21 +137,27 @@ class PlayerMovementTest {
         GameState game = new GameState("1234", messagingTemplate);
         MrX mrX = new MrX("Maxmustermann");
         Detective det = new Detective("Dummy");
+
         game.addPlayer("X", mrX);
         game.addPlayer("D", det);
         game.initRoundManager(List.of(det), mrX);
 
         int from = mrX.getPosition();
-        Edge first = board.getConnectionsFrom(from).get(0);
-        Edge second = board.getConnectionsFrom(first.getTo()).get(0);
+        List<Edge> firstEdges = board.getConnectionsFrom(from);
+        assertFalse(firstEdges.isEmpty(), "Keine Verbindungen vom Startpunkt.");
 
-        boolean moved = game.moveMrXDouble("X",
-                first.getTo(), first.getTicket(),
-                second.getTo(), second.getTicket());
+        Edge first = firstEdges.get(0);
+        List<Edge> secondEdges = board.getConnectionsFrom(first.getTo());
+        assertFalse(secondEdges.isEmpty(), "Keine Verbindungen vom Zwischenziel.");
 
-        assertTrue(moved);
-        assertEquals(second.getTo(), mrX.getPosition());
-        assertEquals(2, game.getMrXMoveHistory().size());
+        Edge second = secondEdges.get(0);
+
+        // ⚠️ Nur EIN Ziel (int) und ZWEI Tickets
+        boolean moved = game.moveMrXDouble("X", first.getTo(), first.getTicket(), second.getTicket());
+
+        assertTrue(moved, "Der Doppelzug sollte erfolgreich sein.");
+        assertEquals(second.getTo(), mrX.getPosition(), "MrX sollte am Ziel des zweiten Zugs stehen.");
+        assertEquals(2, game.getMrXMoveHistory().size(), "Die MrX-Zughistorie sollte zwei Einträge enthalten.");
     }
 
     private void moveMrXToRound(GameState game, MrX mrX, int targetRound) {

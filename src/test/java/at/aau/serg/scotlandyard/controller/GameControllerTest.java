@@ -95,7 +95,10 @@ class GameControllerTest {
     @Test
     void move_WhenPlayerNotFound_ReturnsErrorMessage() {
         when(gameManager.getGame(gameId)).thenReturn(gameState);
-        when(gameState.getAllPlayers()).thenReturn(new HashMap<>());
+
+        Map<String, Player> players = new HashMap<>();
+        // Leere Map = Spieler nicht vorhanden
+        when(gameState.getAllPlayers()).thenReturn(players);
 
         Map<String, String> result = gameController.move(gameId, playerName, position, "TAXI");
 
@@ -150,41 +153,44 @@ class GameControllerTest {
     void moveDouble_WhenGameNotFound_ReturnsGameNotFound() {
         when(gameManager.getGame(gameId)).thenReturn(null);
 
-        ResponseEntity<Map<String, Object>> response = gameController.moveDouble(
-                gameId, playerName, position, Ticket.TAXI, position + 1, Ticket.BUS
-        );
+        Map<String, String> response = gameController.moveDouble(
+                gameId, playerName, 42, "TAXI+BUS");
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("Spiel nicht gefunden!", response.getBody().get("message"));
-        assertEquals("error", response.getBody().get("status"));
+        assertEquals("Spiel nicht gefunden!", response.get("message"));
     }
 
     @Test
     void moveDouble_WhenInvalidMove_ReturnsErrorMessage() {
         when(gameManager.getGame(gameId)).thenReturn(gameState);
-        when(gameState.moveMrXDouble(playerName, position, Ticket.TAXI, position + 1, Ticket.BUS)).thenReturn(false);
 
-        ResponseEntity<Map<String, Object>> response = gameController.moveDouble(
-                gameId, playerName, position, Ticket.TAXI, position + 1, Ticket.BUS
-        );
+        Map<String, Player> players = new HashMap<>();
+        players.put(playerName, null); // Oder mock(Player.class)
+        when(gameState.getAllPlayers()).thenReturn(players);
 
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Ungültiger Doppelzug!", response.getBody().get("message"));
-        assertEquals("error", response.getBody().get("status"));
+        when(gameState.moveMrXDouble(playerName, 42, Ticket.TAXI, Ticket.BUS)).thenReturn(false);
+
+        Map<String, String> response = gameController.moveDouble(
+                gameId, playerName, 42, "TAXI+BUS");
+
+        assertEquals("Ungültiger Zug!", response.get("message"));
     }
 
     @Test
     void moveDouble_WhenValidMove_ReturnsSuccessMessage() {
         when(gameManager.getGame(gameId)).thenReturn(gameState);
-        when(gameState.moveMrXDouble(playerName, position, Ticket.TAXI, position + 1, Ticket.BUS)).thenReturn(true);
 
-        ResponseEntity<Map<String, Object>> response = gameController.moveDouble(
-                gameId, playerName, position, Ticket.TAXI, position + 1, Ticket.BUS
-        );
+        Player mockPlayer = mock(Player.class);
+        Map<String, Player> players = new HashMap<>();
+        players.put(playerName, mockPlayer);
+        when(gameState.getAllPlayers()).thenReturn(players);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("MrX machte einen Doppelzug: " + position + " → " + (position + 1), response.getBody().get("message"));
-        assertEquals("success", response.getBody().get("status"));
+        when(gameState.moveMrXDouble(playerName, 42, Ticket.TAXI, Ticket.BUS)).thenReturn(true);
+        when(gameState.getWinner()).thenReturn(GameState.Winner.NONE);
+
+        Map<String, String> response = gameController.moveDouble(
+                gameId, playerName, 42, "TAXI+BUS");
+
+        assertEquals("Spieler " + playerName + " bewegt sich zu 42 in Spiel " + gameId, response.get("message"));
     }
 
     @Test

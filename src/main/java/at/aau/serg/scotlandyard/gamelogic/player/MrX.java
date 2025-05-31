@@ -29,7 +29,7 @@ public class MrX extends Player {
         return new PlayerTickets(initialTickets);
     }
 
-    public void addTicket(Ticket ticket){
+    public void addTicket(Ticket ticket) {
         switch (ticket) {
             case TAXI:
                 tickets.addTicket(Ticket.TAXI);
@@ -43,40 +43,22 @@ public class MrX extends Player {
         }
     }
 
-    public void moveDouble(int firstTo, Ticket firstTicket, int secondTo, Ticket secondTicket, Board board) {
-        if (!tickets.hasTicket(Ticket.DOUBLE)) {
+    public void useDouble(Ticket ticket) {
+        if (!tickets.hasTicket(ticket)) {
             throw new IllegalArgumentException("Kein DOUBLE-Ticket verfügbar!");
         }
-
-        // Prüfe beide Züge
-        if (!isValidMove(firstTo, firstTicket, board)) {
-            throw new IllegalArgumentException("Erster Zug ungültig!");
-        }
-
-        // Simuliere erste Bewegung temporär, um zweiten Zug zu validieren
-        int originalPos = this.getPosition();
-        this.setPos(firstTo);
-
-        boolean validSecond = isValidMove(secondTo, secondTicket, board);
-        this.setPos(originalPos); // Position zurücksetzen
-
-        if (!validSecond) {
-            throw new IllegalArgumentException("Zweiter Zug ungültig!");
-        }
-
-        // Zug ist gültig → Tickets verwenden und Position setzen
         tickets.useTicket(Ticket.DOUBLE);
-        tickets.useTicket(firstTicket);
-        this.setPos(firstTo);
-
-        tickets.useTicket(secondTicket);
-        this.setPos(secondTo);
-
-        logger.info("MrX machte einen Doppelzug: {} → {}", firstTo, secondTo);
+        logger.info("MrX machte einen Doppelzug: {}",Ticket.DOUBLE);
     }
 
+    public void moveDouble(int to,Ticket ticket) {
 
-    public void moveBlack(int to, Ticket ticket, Board board){
+            tickets.useTicket(ticket);
+            setPos(to);
+
+    }
+
+    public void moveBlack(int to, Ticket ticket, Board board) {
         if (isValidMove(to, ticket, board)) {
             tickets.useTicket(Ticket.BLACK);
             setPos(to);
