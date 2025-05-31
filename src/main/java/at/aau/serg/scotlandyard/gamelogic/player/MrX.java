@@ -43,17 +43,20 @@ public class MrX extends Player {
         }
     }
 
-    public void moveDouble(int to, Ticket ticket1, Ticket ticket2, Board board) {
-        if (!tickets.hasTicket(Ticket.DOUBLE)) {
+    public void useDouble(Ticket ticket) {
+        if (!tickets.hasTicket(ticket)) {
             throw new IllegalArgumentException("Kein DOUBLE-Ticket verfügbar!");
         }
-        System.out.println("HALLO MOVEEEEE");
         tickets.useTicket(Ticket.DOUBLE);
-        setPos(to);
-
-        logger.info("MrX machte einen Doppelzug: {} → {}", to, Ticket.DOUBLE);
+        logger.info("MrX machte einen Doppelzug: {}",Ticket.DOUBLE);
     }
 
+    public void moveDouble(int to,Ticket ticket) {
+
+            tickets.useTicket(ticket);
+            setPos(to);
+
+    }
 
     public void moveBlack(int to, Ticket ticket, Board board) {
         if (isValidMove(to, ticket, board)) {

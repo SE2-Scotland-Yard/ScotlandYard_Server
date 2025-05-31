@@ -231,15 +231,15 @@ public class GameState {
         Player p = players.get(name);
         if (p instanceof MrX mrX) {
             try {
-
+                System.out.println(ticket1);
                 int round = roundManager.getCurrentRound();
-                mrX.move(toFirst,ticket1,board);
-                //mrX.moveDouble(to, ticket1, ticket2, board);
+                mrX.useDouble(Ticket.DOUBLE);
+                mrX.moveDouble(toFirst,ticket1);
 
                 mrXHistory.put(round, new MrXMove(toFirst, ticket1));
                 roundManager.nextRound();
                 round = roundManager.getCurrentRound();
-                mrX.move(to,ticket2,board);
+                mrX.moveDouble(to,ticket2);
                 mrXHistory.put(round, new MrXMove(to, ticket2));
                 roundManager.nextTurn();
 
