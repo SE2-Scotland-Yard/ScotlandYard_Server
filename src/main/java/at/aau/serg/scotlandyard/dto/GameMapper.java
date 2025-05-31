@@ -15,11 +15,25 @@ public class GameMapper {
     }
 
 
+    public static GameUpdate mapToGameUpdate(
+            String gameId,
+            Map<String, Integer> playerPositions,
+            String currentPlayer,
+            String winner,
+            Ticket lastTicketUsed,
+            Map<String, Player> players // <- neue Übergabe
+    ) {
+        Map<String, Map<Ticket, Integer>> ticketInventory = new HashMap<>();
 
-    public static GameUpdate mapToGameUpdate(String gameId, Map<String, Integer> playerPositions, String currentPlayer, String winner,Ticket lastTicketUsed) {
+        for (Map.Entry<String, Player> entry : players.entrySet()) {
+            Player player = entry.getValue();
+            String playerName = entry.getKey();
+            ticketInventory.put(playerName, new HashMap<>(player.getTickets().getTicketMap()));
+        }
 
-        return new GameUpdate(gameId, playerPositions, currentPlayer,winner,lastTicketUsed);
-
+        return new GameUpdate(gameId, playerPositions, currentPlayer, winner, lastTicketUsed, ticketInventory);
     }
+
 }
+
 
