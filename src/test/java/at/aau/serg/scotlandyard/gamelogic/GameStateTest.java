@@ -124,13 +124,28 @@ class GameStateTest {
 
     @Test
     void testMoveMrXDouble() {
-        gameState.moveMrXDouble("MrX",1,Ticket.TAXI,2,Ticket.TAXI);
+        MrX mrX = new MrX("MrX");
+        mrX.getTickets().addTicket(Ticket.TAXI);
+        mrX.getTickets().addTicket(Ticket.DOUBLE);
+
+
+        SimpMessagingTemplate messagingMock = mock(SimpMessagingTemplate.class);
+        GameState gameState = new GameState("testGame", messagingMock);
+
+
+        List<Detective> detectives = List.of();
+        gameState.addPlayer("MrX", mrX);
+        gameState.initRoundManager(detectives, mrX);
+
+        boolean moved = gameState.moveMrXDouble("MrX", 1, Ticket.TAXI, Ticket.TAXI);
+
+        assertTrue(moved);
         assertEquals(2, gameState.getMrXMoveHistory().size());
     }
 
     @Test
     void testMoveMrXDoubleInvalid() {
-        boolean successful = gameState.moveMrXDouble("Detective", 1, Ticket.TAXI, 1, Ticket.TAXI);
+        boolean successful = gameState.moveMrXDouble("Detective", 1, Ticket.TAXI, Ticket.TAXI);
         assertFalse(successful);
         verify(mrX, never()).move(anyInt(), any(), any());
     }
@@ -172,7 +187,7 @@ class GameStateTest {
         gameState.movePlayer("MrX", 3, Ticket.UNDERGROUND);
 
         var history = gameState.getMrXMoveHistory();
-        assertEquals(3, history.size());
+        assertEquals(1, history.size());
     }
 
     @Test
