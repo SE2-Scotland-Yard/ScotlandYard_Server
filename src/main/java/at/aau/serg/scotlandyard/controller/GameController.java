@@ -15,6 +15,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.lang.Integer.parseInt;
+
 @RestController
 @RequestMapping("/api/game")
 public class GameController {
@@ -163,11 +165,13 @@ public class GameController {
         Map<String, String> response = new HashMap<>();
         Ticket ticket1 = null;
         Ticket ticket2 = null;
+        int toFirst = 0;
         String[] ticketsArray = gotTicket.split("\\+");
 
-        if (ticketsArray.length == 2) {
+        if (ticketsArray.length == 3) {
             String ticketType1 = ticketsArray[0];
             String ticketType2 = ticketsArray[1];
+            toFirst = Integer.parseInt(ticketsArray[2]);
             try {
                 ticket1 = Ticket.valueOf(ticketType1);
                 ticket2 = Ticket.valueOf(ticketType2);
@@ -189,7 +193,7 @@ public class GameController {
             response.put(MESSAGE, "Spieler " + name + " existiert nicht!");
             return response;
         }
-        if (!game.moveMrXDouble(name, to, ticket1, ticket2)) {
+        if (!game.moveMrXDouble(name,toFirst, to, ticket1, ticket2)) {
             response.put(MESSAGE, "Ungültiger Zug!");
             return response;
         }
