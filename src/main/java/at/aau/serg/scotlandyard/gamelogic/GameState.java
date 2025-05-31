@@ -263,7 +263,8 @@ public class GameState {
                             playerPositions,
                             getCurrentPlayerName(),
                             winner,
-                            Ticket.DOUBLE
+                            Ticket.DOUBLE,
+                            players
 
 
 
