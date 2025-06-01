@@ -301,8 +301,20 @@ class GameStateTest {
         initialTickets.put(Ticket.DOUBLE, 1);
 
         when(mrX.getTickets()).thenReturn(new PlayerTickets(initialTickets));
+        assertEquals(4, gameState.getAllowedDoubleMoves("MrX").size());
+    }
 
-        assertEquals(6, gameState.getAllowedDoubleMoves("MrX").size());
+    @Test
+    void testGetAllowedDoubleMovesPos2Taxi() {
+        when(mrX.getPosition()).thenReturn(2);
+
+        Map<Ticket, Integer> initialTickets = new EnumMap<>(Ticket.class);
+        initialTickets.put(Ticket.TAXI, 4);
+        initialTickets.put(Ticket.DOUBLE, 1);
+
+        when(mrX.getTickets()).thenReturn(new PlayerTickets(initialTickets));
+
+        assertEquals(2, gameState.getAllowedDoubleMoves("MrX").size());
     }
 
     @Test
