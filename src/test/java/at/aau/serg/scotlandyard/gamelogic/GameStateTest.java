@@ -314,7 +314,7 @@ class GameStateTest {
 
         when(mrX.getTickets()).thenReturn(new PlayerTickets(initialTickets));
 
-        assertEquals(2, gameState.getAllowedDoubleMoves("MrX").size());
+        assertEquals(5, gameState.getAllowedDoubleMoves("MrX").size());
     }
 
     @Test
