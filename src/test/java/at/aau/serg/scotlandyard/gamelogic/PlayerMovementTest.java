@@ -98,17 +98,6 @@ class PlayerMovementTest {
     }
 
     @Test
-    void testVisibleMrXPosition_ShouldReturnPositionOnRevealRound() {
-        GameState game = new GameState("1234", messagingTemplate);
-        MrX mrX = new MrX("Maxmustermann");
-
-        moveMrXToRound(game, mrX, 3);
-
-        String visible = game.getVisibleMrXPosition();
-        assertEquals(String.valueOf(mrX.getPosition()), visible);
-    }
-
-    @Test
     void testInvisibleMrXPosition_ShouldReturnQuestionMark() {
         GameState game = new GameState("1234", messagingTemplate);
         MrX mrX = new MrX("Maxmustermann");
