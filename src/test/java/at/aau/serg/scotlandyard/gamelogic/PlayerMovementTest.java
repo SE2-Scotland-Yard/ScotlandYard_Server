@@ -152,8 +152,7 @@ class PlayerMovementTest {
 
         Edge second = secondEdges.get(0);
 
-        // ⚠️ Nur EIN Ziel (int) und ZWEI Tickets
-        boolean moved = game.moveMrXDouble("X", first.getTo(), first.getTicket(), second.getTicket());
+        boolean moved = game.moveMrXDouble("X", first.getTo(), second.getTo(), first.getTicket(), second.getTicket());
 
         assertTrue(moved, "Der Doppelzug sollte erfolgreich sein.");
         assertEquals(second.getTo(), mrX.getPosition(), "MrX sollte am Ziel des zweiten Zugs stehen.");
