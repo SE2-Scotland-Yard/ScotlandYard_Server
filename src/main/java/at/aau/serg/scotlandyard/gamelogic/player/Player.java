@@ -4,12 +4,14 @@ import at.aau.serg.scotlandyard.gamelogic.board.Board;
 import at.aau.serg.scotlandyard.gamelogic.board.Edge;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.PlayerTickets;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.Ticket;
+import lombok.Setter;
 
 import java.util.*;
 
 public abstract class Player {
     private final String name;
    protected final PlayerTickets tickets;
+   @Setter
    private int pos;
 
 
@@ -69,7 +71,4 @@ public abstract class Player {
     }
 
 
-    public void setPos(int pos) {
-        this.pos = pos;
-    }
 }
