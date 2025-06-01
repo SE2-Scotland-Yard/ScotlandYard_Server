@@ -33,8 +33,6 @@ public class GameState {
     Map<String, Integer> playerPositions = new HashMap<>();
 
 
-
-
     public GameState(String gameId, SimpMessagingTemplate messaging) {
         this.board = new Board();
         this.gameId = gameId;
@@ -208,7 +206,9 @@ public class GameState {
         return roundManager.getCurrentPlayer().getName();
     }
 
-
+    public Player getPlayer(String name){
+        return players.get(name);
+    }
 
     //Winning Condition
     public enum Winner{ MR_X, DETECTIVE, NONE}
