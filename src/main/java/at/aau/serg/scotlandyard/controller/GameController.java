@@ -4,6 +4,8 @@ import at.aau.serg.scotlandyard.dto.GameOverviewDTO;
 import at.aau.serg.scotlandyard.gamelogic.GameManager;
 import at.aau.serg.scotlandyard.gamelogic.GameState;
 import at.aau.serg.scotlandyard.gamelogic.MrXDoubleMove;
+import at.aau.serg.scotlandyard.gamelogic.player.Detective;
+import at.aau.serg.scotlandyard.gamelogic.player.Player;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.Ticket;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.lang.Integer.parseInt;
+import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @RequestMapping("/api/game")
@@ -268,4 +271,21 @@ public class GameController {
                 return "Spiel läuft noch.";
         }
     }
+
+    @PostMapping("/cheat")
+    public ResponseEntity<Integer> shake(@RequestParam String gameId, @RequestParam String name) {
+
+        GameState game = gameManager.getGame(gameId);
+
+        Player player = game.getPlayer(name);
+        if (!(player instanceof Detective)){
+            return ResponseEntity.ok(-1);
+        }
+
+        // Positionen als Feldnummern holen
+        int mrXField = game.getMrXPosition(name);
+
+        return ResponseEntity.ok(mrXField);
+    }
+
 }
