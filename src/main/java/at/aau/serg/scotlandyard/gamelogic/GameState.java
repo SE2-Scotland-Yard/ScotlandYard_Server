@@ -25,7 +25,6 @@ public class GameState {
     private final Map<String, Player> players = new HashMap<>();
     @Getter
     private RoundManager roundManager;
-    private int currentRound = 1;
     private final List<Integer> revealRounds = List.of(3, 8, 13, 18, 24); // Sichtbarkeitsrunden
     private final Map<Integer, MrXMove> mrXHistory = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(GameState.class);
@@ -103,7 +102,7 @@ public class GameState {
             playerPositions = roundManager.getPlayerPositions();
 
             String nextPlayer = getCurrentPlayerName();
-            logger.info("➡️ currentRound: {}, nextPlayer: {}", currentRound, nextPlayer);
+            logger.info("➡️ currentRound: {}, nextPlayer: {}", roundManager.getCurrentRound(), nextPlayer);
             messaging.convertAndSend("/topic/game/" + gameId,
                     GameMapper.mapToGameUpdate(
                             gameId,
@@ -133,7 +132,7 @@ public class GameState {
             playerPositions = roundManager.getPlayerPositions();
             String winner = getWinner().toString();
             String nextPlayer = getCurrentPlayerName();
-            logger.info("➡️ currentRound: {}, nextPlayer: {}, WINNER: {}", currentRound, nextPlayer,getWinner().toString());
+            logger.info("➡️ currentRound: {}, nextPlayer: {}, WINNER: {}", roundManager.getCurrentRound(), nextPlayer,getWinner().toString());
             messaging.convertAndSend("/topic/game/" + gameId,
                     GameMapper.mapToGameUpdate(
                             gameId,
@@ -162,7 +161,7 @@ public class GameState {
 
             String nextPlayer = getCurrentPlayerName();
             String winner = getWinner().toString();
-            logger.info("➡️ currentRound: {}, nextPlayer: {}", currentRound, nextPlayer);
+            logger.info("➡️ currentRound: {}, nextPlayer: {}", roundManager.getCurrentRound(), nextPlayer);
             logger.info("WINNER: {}", getWinner().toString());
             messaging.convertAndSend("/topic/game/" + gameId,
                     GameMapper.mapToGameUpdate(
@@ -256,7 +255,7 @@ public class GameState {
             playerPositions = roundManager.getPlayerPositions();
             String winner = getWinner().toString();
             String nextPlayer = getCurrentPlayerName();
-            logger.info("➡️ currentRound: {}, nextPlayer: {}, WINNER: {}", currentRound, nextPlayer,getWinner().toString());
+            logger.info("➡️ currentRound: {}, nextPlayer: {}, WINNER: {}", roundManager.getCurrentRound(), nextPlayer,getWinner().toString());
             messaging.convertAndSend("/topic/game/" + gameId,
                     GameMapper.mapToGameUpdate(
                             gameId,
@@ -363,7 +362,7 @@ public class GameState {
         }
         if (mrX == null) return "MrX nicht im Spiel";
 
-        if (revealRounds.contains(currentRound - 1)) {
+        if (revealRounds.contains(roundManager.getCurrentRound() - 1)) {
             return String.valueOf(mrX.getPosition()); // letzte sichtbare Position
         } else {
             return "?";
@@ -372,9 +371,7 @@ public class GameState {
 
     public List<String> getMrXMoveHistory() {
         List<String> history = new ArrayList<>();
-        int currentRound = roundManager.getCurrentRound();
-
-        for (int i = 1; i < currentRound; i++) {
+        for (int i = 1; i < roundManager.getCurrentRound(); i++) {
             MrXMove move = mrXHistory.get(i);
             if (move == null) continue;
 
