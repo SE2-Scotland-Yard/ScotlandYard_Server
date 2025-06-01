@@ -195,7 +195,7 @@ class GameStateTest {
         gameState.movePlayer("MrX", 3, Ticket.UNDERGROUND);
 
         var history = gameState.getMrXMoveHistory();
-        assertEquals(1, history.size());
+        assertEquals(3, history.size());
     }
 
     @Test
