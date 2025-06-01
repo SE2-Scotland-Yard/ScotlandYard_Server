@@ -159,11 +159,16 @@ class GameStateTest {
     void testGetVisibleMrXPosition() {
         //get to revealRound
         when(mrX.isValidMove(anyInt(), any(), any())).thenReturn(true);
+        when(detective.isValidMove(anyInt(), any(), any())).thenReturn(true);
         when(mrX.getTickets()).thenReturn(getDefaultTickets());
         when(detective.getTickets()).thenReturn(getDefaultTickets());
         gameState.movePlayer("MrX", 1, Ticket.TAXI);
+        gameState.movePlayer("Detective", 100, Ticket.TAXI);
         gameState.movePlayer("MrX", 8, Ticket.TAXI);
+        gameState.movePlayer("Detective", 101, Ticket.TAXI);
         gameState.movePlayer("MrX", 19, Ticket.TAXI);
+        gameState.movePlayer("Detective", 101, Ticket.TAXI);
+
 
         //test correct String
         when(mrX.getPosition()).thenReturn(19);
@@ -188,11 +193,17 @@ class GameStateTest {
     @Test
     void testGetMrXMoveHistory() {
         when(mrX.isValidMove(anyInt(), any(Ticket.class), any(Board.class))).thenReturn(true);
+        when(detective.isValidMove(anyInt(), any(Ticket.class), any(Board.class))).thenReturn(true);
+
         when(mrX.getTickets()).thenReturn(getDefaultTickets());
         when(detective.getTickets()).thenReturn(getDefaultTickets());
         gameState.movePlayer("MrX", 1, Ticket.TAXI);
+        gameState.movePlayer("Detective", 100, Ticket.TAXI);
         gameState.movePlayer("MrX", 2, Ticket.BUS);
+        gameState.movePlayer("Detective", 101, Ticket.TAXI);
         gameState.movePlayer("MrX", 3, Ticket.UNDERGROUND);
+        gameState.movePlayer("Detective", 102, Ticket.TAXI);
+
 
         var history = gameState.getMrXMoveHistory();
         assertEquals(3, history.size());
