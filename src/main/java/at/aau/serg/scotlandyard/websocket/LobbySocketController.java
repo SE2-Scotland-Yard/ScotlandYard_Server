@@ -12,6 +12,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.Random;
 
 import java.util.*;
 
@@ -85,6 +86,11 @@ public class LobbySocketController {
                 mrX = (MrX) player;
             } else {
                 detectives.add((Detective) player);
+            }
+        }
+        for(Detective detective : detectives) {
+            if(mrX.getPosition()==detective.getPosition()){
+                mrX.setPos(new Random().nextInt(199)+1);
             }
         }
 
@@ -224,5 +230,5 @@ public class LobbySocketController {
             logger.info("→ Eigene Position an MrX gesendet: {}", position);
         }
     }
-    
+
 }
