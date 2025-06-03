@@ -3,7 +3,6 @@ package at.aau.serg.scotlandyard.controller;
 import at.aau.serg.scotlandyard.dto.GameOverviewDTO;
 import at.aau.serg.scotlandyard.gamelogic.GameManager;
 import at.aau.serg.scotlandyard.gamelogic.GameState;
-import at.aau.serg.scotlandyard.gamelogic.MrXDoubleMove;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.Ticket;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +14,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static java.lang.Integer.parseInt;
 
 @RestController
 @RequestMapping("/api/game")
@@ -65,6 +63,7 @@ public class GameController {
         logger.info("Allowed moves: {}", allowedMoves);
         if (allowedMoves.isEmpty()) {
             game.cantMove(gameId);
+
         }
         return ResponseEntity.ok(allowedMoves);
     }
