@@ -1,8 +1,10 @@
 package at.aau.serg.scotlandyard.gamelogic.board;
 
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.Ticket;
+import lombok.Setter;
 
 public class Edge {
+    @Setter
     private int to;
     private Ticket ticket;
 
@@ -19,10 +21,6 @@ public class Edge {
 
     public int getTo() {
         return to;
-    }
-
-    public void setTo(int to) {
-        this.to = to;
     }
 
     public Ticket getTicket() {

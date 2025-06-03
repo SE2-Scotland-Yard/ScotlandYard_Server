@@ -2,18 +2,32 @@ package at.aau.serg.scotlandyard.dto;
 
 
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.List;
 import java.util.Map;
 
 public class LobbyState {
 
+    @Getter
+    @Setter
     private String gameId;
+    @Getter
+    @Setter
     private List<String> players;
+    @Setter
+    @Getter
     private Map<String, Boolean> readyStatus;
     private boolean isPublic;
     private boolean isStarted;
+    @Setter
+    @Getter
     private int maxPlayers;
+    @Setter
+    @Getter
     private int currentPlayerCount;
+    @Getter
     private Map<String, Integer> avatars;
 
     public LobbyState(String gameId,
@@ -37,31 +51,8 @@ public class LobbyState {
 
     // Getter & Setter
 
-    public String getGameId() {
-        return gameId;
-    }
-
-    public void setGameId(String gameId) {
-        this.gameId = gameId;
-    }
-
-    public List<String> getPlayers() {
-        return players;
-    }
-
+    @Getter
     private Map<String, String> selectedRoles;
-
-    public void setPlayers(List<String> players) {
-        this.players = players;
-    }
-
-    public Map<String, Boolean> getReadyStatus() {
-        return readyStatus;
-    }
-
-    public void setReadyStatus(Map<String, Boolean> readyStatus) {
-        this.readyStatus = readyStatus;
-    }
 
     public boolean isPublic() {
         return isPublic;
@@ -78,26 +69,5 @@ public class LobbyState {
     public void setStarted(boolean started) {
         isStarted = started;
     }
-
-    public int getMaxPlayers() {
-        return maxPlayers;
-    }
-
-    public void setMaxPlayers(int maxPlayers) {
-        this.maxPlayers = maxPlayers;
-    }
-
-    public int getCurrentPlayerCount() {
-        return currentPlayerCount;
-    }
-
-    public void setCurrentPlayerCount(int currentPlayerCount) {
-        this.currentPlayerCount = currentPlayerCount;
-    }
-
-    public Map<String, String> getSelectedRoles() {
-        return selectedRoles;
-    }
-    public Map<String, Integer> getAvatars() { return avatars; }
 
 }

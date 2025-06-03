@@ -228,11 +228,6 @@ public class GameController {
     }
 
 
-    @GetMapping("/mrXposition")
-    public String getMrXPosition(@RequestParam String gameId) {
-        GameState game = gameManager.getGame(gameId);
-        return (game != null) ? game.getVisibleMrXPosition() : GAME_NOT_FOUND;
-    }
 
     @GetMapping("/mrXhistory")
     public List<String> getMrXHistory(@RequestParam String gameId) {
