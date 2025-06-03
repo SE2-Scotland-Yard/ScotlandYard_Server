@@ -371,7 +371,7 @@ public class GameState {
 
     public List<String> getMrXMoveHistory() {
         List<String> history = new ArrayList<>();
-        for (int i = 1; i < roundManager.getCurrentRound(); i++) {
+        for (int i = 1; i <= roundManager.getCurrentRound(); i++) {
             MrXMove move = mrXHistory.get(i);
             if (move == null) continue;
 
