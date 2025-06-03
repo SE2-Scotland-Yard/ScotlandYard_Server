@@ -126,7 +126,7 @@ public class GameState {
             int roundBefore = roundManager.getCurrentRound();
             mrXHistory.put(roundBefore, new MrXMove(to, ticket));
             roundManager.nextTurn();
-
+            roundManager.setLastPlayerMoved(p);
 
 
             playerPositions = roundManager.getPlayerPositions();
@@ -155,7 +155,7 @@ public class GameState {
             p.move(to, ticket, board);
             playerPositions = roundManager.getPlayerPositions();
             roundManager.nextTurn();
-
+            roundManager.setLastPlayerMoved(p);
 
             roundManager.addMrXTicket(ticket);
 
@@ -213,11 +213,14 @@ public class GameState {
     public enum Winner{ MR_X, DETECTIVE, NONE}
 
     public Winner getWinner(){
-        if(!roundManager.isGameOver()){
-            return Winner.NONE; //Game still running
+        if(roundManager.mrXwinByNoMoves()){
+            return Winner.MR_X;
         }
         if(roundManager.isMrXCaptured()){
             return Winner.DETECTIVE;
+        }
+        if(!roundManager.isGameOver()){
+            return Winner.NONE; //Game still running
         }
         return Winner.MR_X;
     }
