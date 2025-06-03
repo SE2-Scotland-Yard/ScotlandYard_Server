@@ -127,7 +127,7 @@ public class RoundManager {
     }
     public void gameOver(String gameId) {
         logger.info("Game {} is over",gameId);
-        gameManager.removeGame(gameId);
+
 
     }
 
