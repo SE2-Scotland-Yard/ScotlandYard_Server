@@ -125,11 +125,6 @@ public class RoundManager {
     public boolean isGameOver(){
         return currentRound > MAXROUNDS || isMrXCaptured();
     }
-    public void gameOver(String gameId) {
-        logger.info("Game {} is over",gameId);
-
-
-    }
 
     public void addMrXTicket(Ticket ticket){
         mrX.addTicket(ticket);

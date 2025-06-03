@@ -21,6 +21,7 @@ import java.util.*;
 public class GameState {
     private final SimpMessagingTemplate messaging;
     private final String gameId;
+    @Getter
     private final Board board;
     private final Map<String, Player> players = new HashMap<>();
     @Getter
@@ -146,9 +147,6 @@ public class GameState {
 
                     )
             );
-            if(winner == "DETECTIVE"||winner == "MRX") {
-                roundManager.gameOver(gameId);
-            }
             return true;
         }
         if (p != null && p.isValidMove(to, ticket, board)) {
@@ -174,9 +172,7 @@ public class GameState {
 
                     )
             );
-            if(winner == "DETECTIVE"||winner == "MRX") {
-                roundManager.gameOver(gameId);
-            }
+
             return true;
         }
 
@@ -191,9 +187,6 @@ public class GameState {
         return false;
     }
 
-    public Board getBoard() {
-        return board;
-    }
     public List<Integer> getRevealRounds(){return List.copyOf(revealRounds);}
 
     public Map<String, Player> getAllPlayers() {
@@ -317,60 +310,6 @@ public class GameState {
         }
 
         return result;
-    }
-
-    /*
-    public List<MrXDoubleMove> getAllowedDoubleMoves(String name){
-        Player p = players.get(name);
-        if (!(p instanceof MrX mrX)) {
-            return Collections.emptyList();
-        }
-        List<MrXDoubleMove> doubleMoves = new ArrayList<>();
-
-        if (!mrX.getTickets().hasTicket(Ticket.DOUBLE)) return doubleMoves;
-
-        int originalPos = mrX.getPosition();
-
-        //Erster möglicher Zug
-        for (Edge firstEdge : board.getConnectionsFrom(originalPos)) {
-            int firstTo = firstEdge.getTo();
-            Ticket firstTicket = firstEdge.getTicket();
-
-            mrX.setPos(firstTo);
-            //Zweiter möglicher Zug
-            if (mrX.getTickets().hasTicket(firstTicket)) {
-
-                for (Edge secondEdge : board.getConnectionsFrom(firstTo)) {
-                    int secondTo = secondEdge.getTo();
-                    Ticket secondTicket = secondEdge.getTicket();
-
-                    if (mrX.getTickets().has2Tickets(firstTicket, secondTicket)) {
-                        doubleMoves.add(new MrXDoubleMove(firstTo, firstTicket, secondTo, secondTicket));
-                    }
-                }
-            }
-            mrX.setPos(originalPos);
-        }
-        return doubleMoves;
-    }
-
-     */
-
-    public String getVisibleMrXPosition() {
-        MrX mrX = null;
-        for (Player p : players.values()) {
-            if (p instanceof MrX mrx) {
-                mrX = mrx;
-                break;
-            }
-        }
-        if (mrX == null) return "MrX nicht im Spiel";
-
-        if (revealRounds.contains(roundManager.getCurrentRound() - 1)) {
-            return String.valueOf(mrX.getPosition()); // letzte sichtbare Position
-        } else {
-            return "?";
-        }
     }
 
     public List<String> getMrXMoveHistory() {

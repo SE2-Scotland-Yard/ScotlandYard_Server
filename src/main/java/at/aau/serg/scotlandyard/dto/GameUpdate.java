@@ -1,11 +1,8 @@
 package at.aau.serg.scotlandyard.dto;
 
 
-
-import at.aau.serg.scotlandyard.gamelogic.player.Player;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.Ticket;
 
-import at.aau.serg.scotlandyard.gamelogic.GameState;
 
 import java.util.Map;
 

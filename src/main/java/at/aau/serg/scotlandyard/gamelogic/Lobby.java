@@ -1,5 +1,7 @@
 package at.aau.serg.scotlandyard.gamelogic;
 
+import lombok.Getter;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -8,13 +10,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Lobby {
 
+    @Getter
     private final String gameId;
+    @Getter
     private final Set<String> players = new HashSet<>();
+    @Getter
     private final Map<String, Boolean> readyStatus = new HashMap<>();
     private final Map<String, Role> selectedRoles = new HashMap<>();
     private static final int MINPLAYERS = 1;
     private static final int MAXPLAYERS = 6;
     private final boolean isPublic;
+    @Getter
     private boolean started = false;
     private final Map<String, Integer> avatars = new ConcurrentHashMap<>();
     private final Map<String, Long> lastActivityMap = new HashMap<>();
@@ -103,25 +109,8 @@ public class Lobby {
     }
 
 
-
-    public Set<String> getPlayers() {
-        return players;
-    }
-
-    public Map<String, Boolean> getReadyStatus() {
-        return readyStatus;
-    }
-
-    public String getGameId() {
-        return gameId;
-    }
-
     public boolean isPublic() {
         return isPublic;
-    }
-
-    public boolean isStarted() {
-        return started;
     }
 
     public void markStarted() {

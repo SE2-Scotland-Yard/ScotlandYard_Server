@@ -15,15 +15,6 @@ public class PlayerTickets {
         return tickets.getOrDefault(ticket, 0) > 0;
     }
 
-    public boolean has2Tickets(Ticket ticket1, Ticket ticket2) {
-        if(ticket1.equals(ticket2)) {
-            return tickets.getOrDefault(ticket1, 0) > 1;
-        } else {
-            return hasTicket(ticket1) && hasTicket(ticket2);
-        }
-    }
-
-
     public void useTicket(Ticket ticket) {
         if (!hasTicket(ticket)) {
             throw new IllegalStateException("Spieler hat dieses Ticket nicht");

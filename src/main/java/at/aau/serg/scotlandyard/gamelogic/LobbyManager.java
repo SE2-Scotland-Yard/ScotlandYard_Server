@@ -66,7 +66,7 @@ public class LobbyManager {
 
 
     private String generateGameId(int length) {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        String chars = "0123456789";
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < length; i++) {
             sb.append(chars.charAt(random.nextInt(chars.length())));
