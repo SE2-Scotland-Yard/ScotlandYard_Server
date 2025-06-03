@@ -167,7 +167,7 @@ class GameControllerTest {
         players.put(playerName, null); // Oder mock(Player.class)
         when(gameState.getAllPlayers()).thenReturn(players);
 
-        when(gameState.moveMrXDouble(playerName, 42, Ticket.TAXI, Ticket.BUS)).thenReturn(false);
+        when(gameState.moveMrXDouble(playerName, 41,42,Ticket.TAXI, Ticket.BUS)).thenReturn(false);
 
         Map<String, String> response = gameController.moveDouble(
                 gameId, playerName, 42, "TAXI+BUS");
@@ -184,11 +184,11 @@ class GameControllerTest {
         players.put(playerName, mockPlayer);
         when(gameState.getAllPlayers()).thenReturn(players);
 
-        when(gameState.moveMrXDouble(playerName, 42, Ticket.TAXI, Ticket.BUS)).thenReturn(true);
+        when(gameState.moveMrXDouble(playerName, 17,42, Ticket.TAXI, Ticket.BUS)).thenReturn(true);
         when(gameState.getWinner()).thenReturn(GameState.Winner.NONE);
 
         Map<String, String> response = gameController.moveDouble(
-                gameId, playerName, 42, "TAXI+BUS");
+                gameId, playerName, 42, "TAXI+BUS+17"); //TODO See method
 
         assertEquals("Spieler " + playerName + " bewegt sich zu 42 in Spiel " + gameId, response.get("message"));
     }
