@@ -97,7 +97,7 @@ public class GameState {
             int roundBefore = roundManager.getCurrentRound();
             mrXHistory.put(roundBefore, new MrXMove(to, Ticket.BLACK));
             roundManager.nextTurn();
-
+            roundManager.setLastPlayerMoved(p);
 
             playerPositions = roundManager.getPlayerPositions();
 
@@ -255,6 +255,7 @@ public class GameState {
             } catch (IllegalArgumentException e) {
                 logger.info("Ungültiger Doppelzug von MrX: {}" , e.getMessage());
             }
+            roundManager.setLastPlayerMoved(p);
             playerPositions = roundManager.getPlayerPositions();
             String winner = getWinner().toString();
             String nextPlayer = getCurrentPlayerName();
