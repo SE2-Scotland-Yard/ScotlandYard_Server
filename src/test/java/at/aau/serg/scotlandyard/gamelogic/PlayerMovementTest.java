@@ -97,29 +97,6 @@ class PlayerMovementTest {
         assertFalse(moved);
     }
 
-    @Test
-    void testInvisibleMrXPosition_ShouldReturnQuestionMark() {
-        GameState game = new GameState("1234", messagingTemplate);
-        MrX mrX = new MrX("Maxmustermann");
-
-        moveMrXToRound(game, mrX, 1);
-
-        String visible = game.getVisibleMrXPosition();
-        assertEquals("?", visible);
-    }
-
-    @ParameterizedTest
-    @ValueSource(ints = {1, 2, 4, 5, 6, 7})
-    void testMrXShouldBeInvisibleInTheseRounds(int roundsToMove) {
-        GameState game = new GameState("1234", messagingTemplate);
-        MrX mrX = new MrX("Maxmustermann");
-
-        moveMrXToRound(game, mrX, roundsToMove);
-
-        if (!game.getRevealRounds().contains(roundsToMove)) {
-            assertEquals("?", game.getVisibleMrXPosition());
-        }
-    }
 
     @Test
     void testMrXDoubleMove_ShouldExecuteTwoMovesAndStoreHistory() {

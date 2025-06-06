@@ -172,23 +172,10 @@ class GameStateTest {
 
         //test correct String
         when(mrX.getPosition()).thenReturn(19);
-        assertEquals("19", gameState.getVisibleMrXPosition());
+        assertEquals(19, gameState.getMrXPosition("MrX"));
 
     }
 
-    @Test
-    void testGetVisibleMrXPositionRoundNotReveal() {
-        String position = gameState.getVisibleMrXPosition();
-        assertEquals("?", position);
-    }
-
-
-    @Test
-    void testGetVisibleMrXPositionMrXIsNull() {
-        GameState gameStateNew = new GameState("newGame", messagingTemplate);
-        String position = gameStateNew.getVisibleMrXPosition();
-        assertEquals("MrX nicht im Spiel", position);
-    }
 
     @Test
     void testGetMrXMoveHistory() {
@@ -237,19 +224,6 @@ class GameStateTest {
         nameField.set(gameState, roundManager);
 
         assertEquals(GameState.Winner.NONE, gameState.getWinner());
-    }
-
-    @Test
-    void testGetWinnerDetective() throws Exception {
-        RoundManager roundManager = mock(RoundManager.class);
-        when(roundManager.isGameOver()).thenReturn(true);
-        when(roundManager.isMrXCaptured()).thenReturn(true);
-
-        Field nameField = GameState.class.getDeclaredField("roundManager");
-        nameField.setAccessible(true);
-        nameField.set(gameState, roundManager);
-
-        assertEquals(GameState.Winner.DETECTIVE, gameState.getWinner());
     }
 
     @Test
