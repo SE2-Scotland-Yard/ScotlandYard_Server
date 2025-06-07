@@ -3,7 +3,6 @@ package at.aau.serg.scotlandyard.gamelogic;
 import at.aau.serg.scotlandyard.gamelogic.board.Board;
 import at.aau.serg.scotlandyard.gamelogic.player.Detective;
 import at.aau.serg.scotlandyard.gamelogic.player.MrX;
-import at.aau.serg.scotlandyard.gamelogic.player.Player;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.PlayerTickets;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.Ticket;
 import org.junit.jupiter.api.BeforeEach;
@@ -129,13 +128,13 @@ class GameStateTest {
 
     @Test
     void testMoveMrXDouble() {
-        MrX mrX = new MrX("MrX");
+        mrX = new MrX("MrX");
         mrX.getTickets().addTicket(Ticket.TAXI);
         mrX.getTickets().addTicket(Ticket.DOUBLE);
 
 
         SimpMessagingTemplate messagingMock = mock(SimpMessagingTemplate.class);
-        GameState gameState = new GameState("testGame", messagingMock);
+        gameState = new GameState("testGame", messagingMock);
 
 
         List<Detective> detectives = List.of();

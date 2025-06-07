@@ -188,7 +188,7 @@ class GameControllerTest {
         when(gameState.getWinner()).thenReturn(GameState.Winner.NONE);
 
         Map<String, String> response = gameController.moveDouble(
-                gameId, playerName, 42, "TAXI+BUS+17"); //TODO See method
+                gameId, playerName, 42, "TAXI+BUS+17"); //See method
 
         assertEquals("Spieler " + playerName + " bewegt sich zu 42 in Spiel " + gameId, response.get("message"));
     }

@@ -50,7 +50,7 @@ public class LobbySocketController {
         if (lobby.allReady() && lobby.hasEnoughPlayers() && !lobby.isStarted()) {
             if (!lobby.hasExactlyOneMrX()) {
                 // Broadcast-Fehlermeldung an alle in der Lobby
-                messaging.convertAndSend("/topic/lobby/" + gameId + "/error",
+                messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId + "/error",
                         Map.of("error", "Es konnte kein Verbrecher ausgemacht werden"));
 
                 // Alle wieder auf 'nicht bereit' setzen
@@ -68,7 +68,10 @@ public class LobbySocketController {
             messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId, LobbyMapper.toLobbyState(lobby)); // Lobby-Update
 
             GameState game = initializeGame(gameId, lobby);
-            logger.info(game.toString());
+            if(game != null){
+                logger.info(game.toString());
+            }
+
         }
     }
 
@@ -153,7 +156,7 @@ public class LobbySocketController {
         //Aktivität updaten
         lobby.updateLastActivity(msg.getPlayerId());
 
-        if (lobby != null && Role.DETECTIVE.equals(lobby.getSelectedRole(msg.getPlayerId()))) {
+        if (Role.DETECTIVE.equals(lobby.getSelectedRole(msg.getPlayerId()))) {
             int desiredAvatar = msg.getAvatarResId();
             String playerId = msg.getPlayerId();
 
@@ -199,7 +202,7 @@ public class LobbySocketController {
         Lobby lobby = lobbyManager.getLobby(gameId);
         if (lobby != null) {
             lobby.updateLastActivity(playerId);
-            System.out.println("→ Ping erhalten von " + playerId);
+            logger.info("→ Ping erhalten von {}" , playerId);
         }
     }
 

@@ -8,7 +8,7 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 
 import static org.mockito.Mockito.*;
 
-public class StompWebSocketConfigTest {
+class StompWebSocketConfigTest {
 
     @Test
     void testRegisterStompEndpoints() {
