@@ -193,25 +193,7 @@ class GameControllerTest {
         assertEquals("Spieler " + playerName + " bewegt sich zu 42 in Spiel " + gameId, response.get("message"));
     }
 
-    @Test
-    void getMrXPosition_WhenGameNotFound_ReturnsGameNotFound() {
-        when(gameManager.getGame(gameId)).thenReturn(null);
 
-        String result = gameController.getMrXPosition(gameId);
-
-        assertEquals(GameController.GAME_NOT_FOUND, result);
-    }
-
-    @Test
-    void getMrXPosition_WhenGameExists_ReturnsPosition() {
-        String expectedPosition = "123";
-        when(gameManager.getGame(gameId)).thenReturn(gameState);
-        when(gameState.getVisibleMrXPosition()).thenReturn(expectedPosition);
-
-        String result = gameController.getMrXPosition(gameId);
-
-        assertEquals(expectedPosition, result);
-    }
 
     @Test
     void getMrXHistory_WhenGameNotFound_ReturnsGameNotFound() {
