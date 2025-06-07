@@ -3,7 +3,6 @@ package at.aau.serg.scotlandyard.gamelogic;
 import at.aau.serg.scotlandyard.gamelogic.board.Board;
 import at.aau.serg.scotlandyard.gamelogic.player.Detective;
 import at.aau.serg.scotlandyard.gamelogic.player.MrX;
-import at.aau.serg.scotlandyard.gamelogic.player.Player;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.PlayerTickets;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.Ticket;
 import org.junit.jupiter.api.BeforeEach;

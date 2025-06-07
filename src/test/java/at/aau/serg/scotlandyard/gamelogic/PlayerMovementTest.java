@@ -7,8 +7,6 @@ import at.aau.serg.scotlandyard.gamelogic.player.MrX;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.Ticket;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.List;

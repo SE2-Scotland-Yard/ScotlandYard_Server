@@ -170,7 +170,7 @@ public class GameController {
         if (ticketsArray.length == 3) {
             String ticketType1 = ticketsArray[0];
             String ticketType2 = ticketsArray[1];
-            toFirst = Integer.parseInt(ticketsArray[2]); //TODO change signature to include Firstto, dont put in Array
+            toFirst = Integer.parseInt(ticketsArray[2]); //change signature to include Firstto, dont put in Array
             try {
                 ticket1 = Ticket.valueOf(ticketType1);
                 ticket2 = Ticket.valueOf(ticketType2);

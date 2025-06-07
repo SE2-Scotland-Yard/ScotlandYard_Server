@@ -1,6 +1,5 @@
 package at.aau.serg.scotlandyard.dto;
 
-import at.aau.serg.scotlandyard.gamelogic.GameState;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.Ticket;
 import org.junit.jupiter.api.Test;
 
