@@ -50,7 +50,7 @@ public class LobbySocketController {
         if (lobby.allReady() && lobby.hasEnoughPlayers() && !lobby.isStarted()) {
             if (!lobby.hasExactlyOneMrX()) {
                 // Broadcast-Fehlermeldung an alle in der Lobby
-                messaging.convertAndSend("/topic/lobby/" + gameId + "/error",
+                messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId + "/error",
                         Map.of("error", "Es konnte kein Verbrecher ausgemacht werden"));
 
                 // Alle wieder auf 'nicht bereit' setzen

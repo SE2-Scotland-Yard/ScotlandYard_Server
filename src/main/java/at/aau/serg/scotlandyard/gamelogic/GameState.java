@@ -29,6 +29,7 @@ public class GameState {
     private final List<Integer> revealRounds = List.of(3, 8, 13, 18, 24); // Sichtbarkeitsrunden
     private final Map<Integer, MrXMove> mrXHistory = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(GameState.class);
+    private static final String TOPIC_GAME = "/topic/game/";
 
     Map<String, Integer> playerPositions = new HashMap<>();
 
@@ -47,7 +48,7 @@ public class GameState {
 
     public void cantMove(String gameId) {
         roundManager.nextTurn();
-        messaging.convertAndSend("/topic/game/" + gameId,
+        messaging.convertAndSend(TOPIC_GAME + gameId,
                 GameMapper.mapToGameUpdate(
                         gameId,
                         playerPositions,
@@ -104,7 +105,7 @@ public class GameState {
 
             String nextPlayer = getCurrentPlayerName();
             logger.info("➡️ currentRound: {}, nextPlayer: {}", roundManager.getCurrentRound(), nextPlayer);
-            messaging.convertAndSend("/topic/game/" + gameId,
+            messaging.convertAndSend(TOPIC_GAME + gameId,
                     GameMapper.mapToGameUpdate(
                             gameId,
                             playerPositions,
@@ -134,7 +135,7 @@ public class GameState {
             String winner = getWinner().toString();
             String nextPlayer = getCurrentPlayerName();
             logger.info("➡️ currentRound: {}, nextPlayer: {}, WINNER: {}", roundManager.getCurrentRound(), nextPlayer,winner);
-            messaging.convertAndSend("/topic/game/" + gameId,
+            messaging.convertAndSend(TOPIC_GAME + gameId,
                     GameMapper.mapToGameUpdate(
                             gameId,
                             playerPositions,
@@ -161,7 +162,7 @@ public class GameState {
             String winner = getWinner().toString();
             logger.info("➡️ currentRound: {}, nextPlayer: {}", roundManager.getCurrentRound(), nextPlayer);
             logger.info("WINNER: {}", winner);
-            messaging.convertAndSend("/topic/game/" + gameId,
+            messaging.convertAndSend(TOPIC_GAME + gameId,
                     GameMapper.mapToGameUpdate(
                             gameId,
                             playerPositions,
@@ -253,7 +254,7 @@ public class GameState {
             String winner = getWinner().toString();
             String nextPlayer = getCurrentPlayerName();
             logger.info("➡️ currentRound: {}, nextPlayer: {}, WINNER: {}", roundManager.getCurrentRound(), nextPlayer, winner);
-            messaging.convertAndSend("/topic/game/" + gameId,
+            messaging.convertAndSend(TOPIC_GAME + gameId,
                     GameMapper.mapToGameUpdate(
                             gameId,
                             playerPositions,
