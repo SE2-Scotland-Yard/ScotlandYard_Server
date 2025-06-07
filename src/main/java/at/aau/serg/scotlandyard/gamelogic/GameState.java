@@ -133,7 +133,7 @@ public class GameState {
             playerPositions = roundManager.getPlayerPositions();
             String winner = getWinner().toString();
             String nextPlayer = getCurrentPlayerName();
-            logger.info("➡️ currentRound: {}, nextPlayer: {}, WINNER: {}", roundManager.getCurrentRound(), nextPlayer,getWinner().toString());
+            logger.info("➡️ currentRound: {}, nextPlayer: {}, WINNER: {}", roundManager.getCurrentRound(), nextPlayer,winner);
             messaging.convertAndSend("/topic/game/" + gameId,
                     GameMapper.mapToGameUpdate(
                             gameId,
@@ -160,7 +160,7 @@ public class GameState {
             String nextPlayer = getCurrentPlayerName();
             String winner = getWinner().toString();
             logger.info("➡️ currentRound: {}, nextPlayer: {}", roundManager.getCurrentRound(), nextPlayer);
-            logger.info("WINNER: {}", getWinner().toString());
+            logger.info("WINNER: {}", winner);
             messaging.convertAndSend("/topic/game/" + gameId,
                     GameMapper.mapToGameUpdate(
                             gameId,
@@ -233,7 +233,7 @@ public class GameState {
         Player p = players.get(name);
         if (p instanceof MrX mrX) {
             try {
-                System.out.println(ticket1);
+                logger.info("Ticket 1: {}", ticket1);
                 int round = roundManager.getCurrentRound();
                 mrX.useDouble(Ticket.DOUBLE);
                 mrX.moveDouble(toFirst,ticket1);
@@ -252,7 +252,7 @@ public class GameState {
             playerPositions = roundManager.getPlayerPositions();
             String winner = getWinner().toString();
             String nextPlayer = getCurrentPlayerName();
-            logger.info("➡️ currentRound: {}, nextPlayer: {}, WINNER: {}", roundManager.getCurrentRound(), nextPlayer,getWinner().toString());
+            logger.info("➡️ currentRound: {}, nextPlayer: {}, WINNER: {}", roundManager.getCurrentRound(), nextPlayer, winner);
             messaging.convertAndSend("/topic/game/" + gameId,
                     GameMapper.mapToGameUpdate(
                             gameId,

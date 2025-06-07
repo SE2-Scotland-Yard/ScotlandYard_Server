@@ -83,12 +83,8 @@ public class Lobby {
             return;
         }
 
-        // Avatar darf nur gewählt werden, wenn er nicht bereits vergeben ist
-        if (avatars.containsValue(avatar)) {
-            // Wenn jemand anders diesen Avatar schon hat → nicht setzen
-            if (!avatar.equals(avatars.get(player))) {
-                return;
-            }
+        if (avatars.containsValue(avatar) && !avatar.equals(avatars.get(player))) {
+            return;
         }
 
         avatars.put(player, avatar);

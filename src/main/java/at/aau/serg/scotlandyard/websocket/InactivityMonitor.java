@@ -6,6 +6,8 @@ import at.aau.serg.scotlandyard.dto.LobbyMapper;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -14,6 +16,8 @@ public class InactivityMonitor {
 
     private final LobbyManager lobbyManager;
     private final SimpMessagingTemplate messaging;
+
+    private static final Logger logger = LoggerFactory.getLogger(InactivityMonitor.class);
 
     public InactivityMonitor(LobbyManager lobbyManager, SimpMessagingTemplate messaging) {
         this.lobbyManager = lobbyManager;
@@ -41,7 +45,7 @@ public class InactivityMonitor {
 
             for (String player : toKick) {
                 lobby.removePlayer(player);
-                System.out.println("Inaktiver Spieler entfernt: " + player);
+                logger.info("Inaktiver Spieler entfernt: {}", player);
             }
 
             // Sende Update an alle Clients
@@ -56,7 +60,7 @@ public class InactivityMonitor {
         // Nach dem Durchlauf entfernen
         for (String gameId : lobbiesToRemove) {
             lobbyManager.removeLobby(gameId);
-            System.out.println("Leere Lobby gelöscht: " + gameId);
+            logger.info("Leere Lobby gelöscht: {}", gameId);
         }
     }
 }
