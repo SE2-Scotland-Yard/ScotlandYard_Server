@@ -25,7 +25,7 @@ public class GameController {
     private static final String MESSAGE = "message";
     private static final String GAME_MIT_ID = "Game mit ID '";
     private static final String NICHT_GEFUNDEN = "' nicht gefunden.";
-    private static final String UNGUELTIGES_TICKET = "Ungütliges TIcket: ";
+    private static final String UNGUELTIGES_TICKET = "Ungütliges Ticket: ";
     private static final String SPIEL_NICHT_GEFUNDEN = "Spiel nicht gefunden!";
     private static final String EXISTIERT_NICHT = " existiert nicht!";
     private static final String SPIELER = "Spieler ";
