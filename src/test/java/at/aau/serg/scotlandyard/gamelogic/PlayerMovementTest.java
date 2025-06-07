@@ -139,4 +139,40 @@ class PlayerMovementTest {
             currentPos = edge.getTo();
         }
     }
+
+    @Test
+    void moveBlackTest_ValidMove(){
+        MrX mrX = new MrX("MrX");
+        GameState game = new GameState("game-id", messagingTemplate);
+        Detective det = new Detective("Dummy");
+
+        game.addPlayer("X", mrX);
+        game.addPlayer("D", det);
+        game.initRoundManager(List.of(det), mrX);
+
+        int from = mrX.getPosition();
+        List<Edge> connections = board.getConnectionsFrom(from);
+
+        Edge validEdge = connections.stream()
+                .filter(e -> e.getTicket() != Ticket.DOUBLE) // Sicherheitscheck
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Kein gültiger Pfad für MrX gefunden"));
+
+        mrX.getTickets().addTicket(Ticket.BLACK);
+
+        mrX.moveBlack(validEdge.getTo(), validEdge.getTicket(), board);
+
+        assertEquals(validEdge.getTo(), mrX.getPosition());
+    }
+
+    @Test
+    void testMoveBlack_InvalidMove_ShouldThrowException() {
+        MrX mrX = new MrX("MrX");
+        mrX.getTickets().addTicket(Ticket.BLACK);
+
+        assertThrows(IllegalArgumentException.class, () ->
+                mrX.moveBlack(9999, Ticket.TAXI, board));
+    }
+
+
 }

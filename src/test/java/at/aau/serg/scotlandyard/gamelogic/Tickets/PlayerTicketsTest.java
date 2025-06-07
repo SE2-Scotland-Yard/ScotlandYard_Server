@@ -58,6 +58,13 @@ class PlayerTicketsTest {
 
         playerTickets.addTicket(Ticket.DOUBLE);
         assertEquals(1, playerTickets.getTicketCount(Ticket.DOUBLE));
+
+        playerTickets.addTicket(Ticket.BUS);
+        assertEquals(4, playerTickets.getTicketCount(Ticket.BUS));
+
+        playerTickets.addTicket(Ticket.UNDERGROUND);
+        assertEquals(3, playerTickets.getTicketCount(Ticket.UNDERGROUND));
+
     }
 
     @Test
@@ -68,6 +75,9 @@ class PlayerTicketsTest {
         assertEquals(1, playerTickets.getTicketCount(Ticket.BLACK));
         assertEquals(0, playerTickets.getTicketCount(Ticket.DOUBLE));
     }
+
+
+
 
 
 }
