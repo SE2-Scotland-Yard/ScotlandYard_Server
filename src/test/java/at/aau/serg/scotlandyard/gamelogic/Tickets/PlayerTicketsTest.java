@@ -1,5 +1,6 @@
 package at.aau.serg.scotlandyard.gamelogic.Tickets;
 
+import at.aau.serg.scotlandyard.gamelogic.player.MrX;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.PlayerTickets;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.Ticket;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,13 +59,6 @@ class PlayerTicketsTest {
 
         playerTickets.addTicket(Ticket.DOUBLE);
         assertEquals(1, playerTickets.getTicketCount(Ticket.DOUBLE));
-
-        playerTickets.addTicket(Ticket.BUS);
-        assertEquals(4, playerTickets.getTicketCount(Ticket.BUS));
-
-        playerTickets.addTicket(Ticket.UNDERGROUND);
-        assertEquals(3, playerTickets.getTicketCount(Ticket.UNDERGROUND));
-
     }
 
     @Test
@@ -76,8 +70,25 @@ class PlayerTicketsTest {
         assertEquals(0, playerTickets.getTicketCount(Ticket.DOUBLE));
     }
 
+    @Test
+    void testMrXAddTicket_TaxiBusUnderground() {
+        MrX mrX = new MrX("GeheimagentX");
 
+        // Taxi
+        int oldTaxi = mrX.getTickets().getTicketCount(Ticket.TAXI);
+        mrX.addTicket(Ticket.TAXI);
+        assertEquals(oldTaxi + 1, mrX.getTickets().getTicketCount(Ticket.TAXI));
 
+        // Bus
+        int oldBus = mrX.getTickets().getTicketCount(Ticket.BUS);
+        mrX.addTicket(Ticket.BUS);
+        assertEquals(oldBus + 1, mrX.getTickets().getTicketCount(Ticket.BUS));
+
+        // Underground
+        int oldUnderground = mrX.getTickets().getTicketCount(Ticket.UNDERGROUND);
+        mrX.addTicket(Ticket.UNDERGROUND);
+        assertEquals(oldUnderground + 1, mrX.getTickets().getTicketCount(Ticket.UNDERGROUND));
+    }
 
 
 }
