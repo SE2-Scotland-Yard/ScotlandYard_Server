@@ -1,5 +1,7 @@
 package at.aau.serg.scotlandyard.websocket;
 
+
+
 import at.aau.serg.scotlandyard.gamelogic.GameManager;
 import at.aau.serg.scotlandyard.gamelogic.GameState;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.Ticket;
@@ -21,6 +23,39 @@ public class GameSocketController {
         this.gameManager = gameManager;
         this.messaging = messaging;
     }
+
+    @MessageMapping("/game/ping")
+    public void handleGamePing(Map<String, String> payload) {
+        String gameId = payload.get("gameId");
+        String playerId = payload.get("playerId");
+
+        GameState game = gameManager.getGame(gameId);
+        if (game != null) {
+            game.updateLastActivity(playerId);
+            System.out.println("→ [GAME]]Ping erhalten im Spiel von " + playerId);
+        }
+    }
+
+    @MessageMapping("/game/leave")
+    public void handleGameLeave(Map<String, String> payload) {
+        String gameId = payload.get("gameId");
+        String playerId = payload.get("playerId");
+
+        System.out.println("Game leave received: " + gameId + ", " + playerId);
+
+        GameState game = gameManager.getGame(gameId);
+        if (game != null) {
+            game.replaceWithBot(playerId);
+            System.out.println("Spieler ersetzt durch Bot: " + playerId);
+        }
+    }
+
+
+
+
+
+
+
 
 
     @MessageMapping("/game/allowedMoves")

@@ -1,6 +1,7 @@
 package at.aau.serg.scotlandyard.gamelogic;
 
 
+import at.aau.serg.scotlandyard.bot.BotFactory;
 import at.aau.serg.scotlandyard.dto.GameMapper;
 
 import at.aau.serg.scotlandyard.gamelogic.board.Board;
@@ -9,10 +10,13 @@ import at.aau.serg.scotlandyard.gamelogic.player.Detective;
 import at.aau.serg.scotlandyard.gamelogic.player.MrX;
 import at.aau.serg.scotlandyard.gamelogic.player.Player;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.Ticket;
+import at.aau.serg.scotlandyard.bot.BotLogic;
+
 
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.*;
@@ -30,6 +34,10 @@ public class GameState {
     private static final Logger logger = LoggerFactory.getLogger(GameState.class);
 
     Map<String, Integer> playerPositions = new HashMap<>();
+    private final Map<String, Long> lastActivityMap = new HashMap<>();
+    @Autowired
+    private GameManager gameManager;
+
 
 
 
@@ -42,6 +50,7 @@ public class GameState {
 
     public void initRoundManager(List<Detective>detectives, MrX mrX){ //nicht ideal
         this.roundManager = new RoundManager(detectives, mrX);
+        this.roundManager.setGameState(this);
     }
 
     public void cantMove(String gameId) {
@@ -207,6 +216,9 @@ public class GameState {
         return roundManager.getCurrentPlayer().getName();
     }
 
+    public String getGameId() {
+        return  gameId;
+    }
 
 
     //Winning Condition
@@ -264,8 +276,6 @@ public class GameState {
                             winner,
                             Ticket.DOUBLE,
                             players
-
-
 
                     )
             );
@@ -384,6 +394,71 @@ public class GameState {
         return history;
     }
 
+
+    public void updateLastActivity(String playerId) {
+        lastActivityMap.put(playerId, System.currentTimeMillis());
+    }
+
+    public Map<String, Long> getLastActivityMap() {
+        return new HashMap<>(lastActivityMap);
+    }
+
+    public Player replaceWithBot(String playerName) {
+        Player original = players.get(playerName);
+        if (original == null) return null;
+
+        // Wenn MrX geht, Spiel abbrechen (nicht durch Bot ersetzen)
+        if (original.isMrX()) {
+            messaging.convertAndSend("/topic/game/" + gameId + "/system", "mrX");
+
+            // Spiel sofort löschen, weil MrX weg ist
+            gameManager.removeGame(gameId);
+
+            System.out.println("MrX hat das Spiel verlassen – Game " + gameId + " wurde entfernt.");
+            return null;
+        }
+
+
+        // Bot erzeugen und Spieler ersetzen
+        Player bot = BotFactory.createBotReplacement(original);
+        if (bot != null) {
+            players.remove(original.getName());
+            playerPositions.remove(original.getName());
+            players.put(bot.getName(), bot);
+
+            if (roundManager != null) {
+                roundManager.replacePlayer(original, bot);
+            }
+
+            messaging.convertAndSend(
+                    "/topic/game/" + gameId + "/system",
+                    "🤖 Spieler '" + original.getName() + "' wurde durch den Bot '" + bot.getName() + "' ersetzt."
+            );
+
+            // Bot sofort handeln lassen, falls er am Zug ist
+            if (bot.getName().equals(getCurrentPlayerName())) {
+                var move = BotLogic.decideMove(bot.getName(), this);
+                if (move != null) {
+                    movePlayer(bot.getName(), move.getKey(), move.getValue());
+                } else {
+                    cantMove(gameId);
+                }
+            }
+
+            if (onlyBotsLeft()) {
+                gameManager.removeGame(gameId);
+            }
+
+
+            return bot;
+        }
+
+        return null;
+    }
+
+    public boolean onlyBotsLeft() {
+        return players.values().stream().allMatch(Player::isBot);
+    }
 
 }
 

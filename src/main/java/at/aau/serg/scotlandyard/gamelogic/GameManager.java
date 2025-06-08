@@ -11,7 +11,7 @@ import java.util.Set;
 @Component
 public class GameManager {
 
-    private final Map<String, GameState> games = new HashMap<>();
+    private static final Map<String, GameState> games = new HashMap<>();
     private final SimpMessagingTemplate messaging;
 
     @Autowired
@@ -27,11 +27,19 @@ public class GameManager {
         return games.get(gameId);
     }
 
-    public void removeGame(String gameId) {
+    public static void removeGame(String gameId) {
         games.remove(gameId);
     }
 
     public Set<String> getAllGameIds() {
         return games.keySet();
     }
+
+    public void updateLastActivity(String gameId, String playerId) {
+        GameState game = games.get(gameId);
+        if (game != null) {
+            game.updateLastActivity(playerId);
+        }
+    }
+
 }

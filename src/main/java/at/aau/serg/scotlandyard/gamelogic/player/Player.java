@@ -72,4 +72,13 @@ public abstract class Player {
     public void setPos(int pos) {
         this.pos = pos;
     }
+
+    public boolean isMrX() {
+        return this instanceof MrX;
+    }
+
+    public boolean isBot() {
+        return false; // Standardmäßig: kein Bot
+    }
+
 }
