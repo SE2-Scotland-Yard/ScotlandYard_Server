@@ -23,6 +23,19 @@ public class GameController {
     private final GameManager gameManager;
     private static final Logger logger = LoggerFactory.getLogger(GameController.class);
     private static final String MESSAGE = "message";
+    private static final String GAME_MIT_ID = "Game mit ID '";
+    private static final String NICHT_GEFUNDEN = "' nicht gefunden.";
+    private static final String UNGUELTIGES_TICKET = "Ungültiges Ticket: ";
+    private static final String SPIEL_NICHT_GEFUNDEN = "Spiel nicht gefunden!";
+    private static final String EXISTIERT_NICHT = " existiert nicht!";
+    private static final String SPIELER = "Spieler ";
+    private static final String UNGUELTIGER_ZUG = "Ungültiger Zug!";
+    private static final String BEWEGT_SICH_ZU = " bewegt sich zu ";
+    private static final String IN_SPIEL = " in Spiel ";
+
+
+
+
 
     public GameController(GameManager gameManager) {
         this.gameManager = gameManager;
@@ -37,7 +50,7 @@ public class GameController {
 
         if (game == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Game mit ID '" + gameId + "' nicht gefunden.");
+                    .body(GAME_MIT_ID + gameId + NICHT_GEFUNDEN);
         }
 
         int mrXPosition = game.getMrXPosition(name);
@@ -54,7 +67,7 @@ public class GameController {
 
         if (game == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Game mit ID '" + gameId + "' nicht gefunden.");
+                    .body(GAME_MIT_ID + gameId + NICHT_GEFUNDEN);
         }
 
         List<Map.Entry<Integer, String>> allowedMoves = game.getAllowedMoves(name).stream()
@@ -80,20 +93,20 @@ public class GameController {
         try {
             ticket = Ticket.valueOf(gotTicket);
         } catch (IllegalArgumentException e) {
-            response.put(MESSAGE, "Ungültiges Ticket: " + gotTicket);
+            response.put(MESSAGE, UNGUELTIGES_TICKET + gotTicket);
             return response;
         }
         GameState game = gameManager.getGame(gameId);
         if (game == null) {
-            response.put(MESSAGE, "Spiel nicht gefunden!");
+            response.put(MESSAGE, SPIEL_NICHT_GEFUNDEN);
             return response;
         }
         if (!game.getAllPlayers().containsKey(name)) {
-            response.put(MESSAGE, "Spieler " + name + " existiert nicht!");
+            response.put(MESSAGE, SPIELER + name + EXISTIERT_NICHT);
             return response;
         }
         if (!game.moveBlackTicket(name, to, ticket)) {
-            response.put(MESSAGE, "Ungültiger Zug!");
+            response.put(MESSAGE, UNGUELTIGER_ZUG);
             return response;
         }
         if (game.getWinner() != GameState.Winner.NONE) {
@@ -101,7 +114,7 @@ public class GameController {
             return response;
         }
 
-        response.put(MESSAGE, "Spieler " + name + " bewegt sich zu " + to + " in Spiel " + gameId);
+        response.put(MESSAGE, SPIELER + name + BEWEGT_SICH_ZU + to + IN_SPIEL + gameId);
         return response;
     }
 
@@ -119,26 +132,26 @@ public class GameController {
         try {
             ticket = Ticket.valueOf(gotTicket);
         } catch (IllegalArgumentException e) {
-            response.put(MESSAGE, "Ungültiges Ticket: " + gotTicket);
+            response.put(MESSAGE, UNGUELTIGES_TICKET + gotTicket);
             return response;
         }
 
         // 2. Spiel validieren
         GameState game = gameManager.getGame(gameId);
         if (game == null) {
-            response.put(MESSAGE, "Spiel nicht gefunden!");
+            response.put(MESSAGE, SPIEL_NICHT_GEFUNDEN);
             return response;
         }
 
         // 3. Spieler existiert?
         if (!game.getAllPlayers().containsKey(name)) {
-            response.put(MESSAGE, "Spieler " + name + " existiert nicht!");
+            response.put(MESSAGE, SPIELER + name + EXISTIERT_NICHT);
             return response;
         }
 
         // 4. Zug durchführen
         if (!game.movePlayer(name, to, ticket)) {
-            response.put(MESSAGE, "Ungültiger Zug!");
+            response.put(MESSAGE, UNGUELTIGER_ZUG);
             return response;
         }
 
@@ -149,7 +162,7 @@ public class GameController {
             return response;
         }
 
-        response.put(MESSAGE, "Spieler " + name + " bewegt sich zu " + to + " in Spiel " + gameId);
+        response.put(MESSAGE, SPIELER + name + BEWEGT_SICH_ZU + to + IN_SPIEL + gameId);
         return response;
     }
 
@@ -170,12 +183,12 @@ public class GameController {
         if (ticketsArray.length == 3) {
             String ticketType1 = ticketsArray[0];
             String ticketType2 = ticketsArray[1];
-            toFirst = Integer.parseInt(ticketsArray[2]); //TODO change signature to include Firstto, dont put in Array
+            toFirst = Integer.parseInt(ticketsArray[2]); //change signature to include Firstto, dont put in Array
             try {
                 ticket1 = Ticket.valueOf(ticketType1);
                 ticket2 = Ticket.valueOf(ticketType2);
             } catch (IllegalArgumentException e) {
-                response.put(MESSAGE, "Ungültiges Ticket: " + gotTicket);
+                response.put(MESSAGE, UNGUELTIGES_TICKET + gotTicket);
                 return response;
             }
         } else {
@@ -185,15 +198,15 @@ public class GameController {
 
         GameState game = gameManager.getGame(gameId);
         if (game == null) {
-            response.put(MESSAGE, "Spiel nicht gefunden!");
+            response.put(MESSAGE, SPIEL_NICHT_GEFUNDEN);
             return response;
         }
         if (!game.getAllPlayers().containsKey(name)) {
-            response.put(MESSAGE, "Spieler " + name + " existiert nicht!");
+            response.put(MESSAGE, SPIELER + name + EXISTIERT_NICHT);
             return response;
         }
         if (!game.moveMrXDouble(name,toFirst, to, ticket1, ticket2)) {
-            response.put(MESSAGE, "Ungültiger Zug!");
+            response.put(MESSAGE, UNGUELTIGER_ZUG);
             return response;
         }
         if (game.getWinner() != GameState.Winner.NONE) {
@@ -201,7 +214,7 @@ public class GameController {
             return response;
         }
 
-        response.put(MESSAGE, "Spieler " + name + " bewegt sich zu " + to + " in Spiel " + gameId);
+        response.put(MESSAGE, SPIELER + name + BEWEGT_SICH_ZU + to + IN_SPIEL + gameId);
         return response;
     }
 
@@ -214,7 +227,7 @@ public class GameController {
 
         if (game == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Game mit ID '" + gameId + "' nicht gefunden.");
+                    .body(GAME_MIT_ID + gameId + NICHT_GEFUNDEN);
         }
 
         List<Map.Entry<Integer, String>> doubleMoves = game.getAllowedDoubleMoves(name).stream()

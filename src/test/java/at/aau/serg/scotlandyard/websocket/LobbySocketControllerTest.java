@@ -19,7 +19,7 @@ class LobbySocketControllerTest {
     private SimpMessagingTemplate messaging;
     private LobbySocketController controller;
     private Lobby lobby;
-    private GameState gameState;
+
 
     @BeforeEach
     void setUp() {
@@ -29,7 +29,7 @@ class LobbySocketControllerTest {
         controller = new LobbySocketController(lobbyManager, gameManager, messaging);
 
         lobby = mock(Lobby.class);
-        gameState = mock(GameState.class);
+
     }
 
     @Test
