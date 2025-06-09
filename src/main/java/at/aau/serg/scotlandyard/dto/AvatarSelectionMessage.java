@@ -2,8 +2,8 @@ package at.aau.serg.scotlandyard.dto;
 
 import lombok.Setter;
 
+@Setter
 public class AvatarSelectionMessage {
-    @Setter
     private String gameId;
     private String playerId;
     private int avatarResId;
