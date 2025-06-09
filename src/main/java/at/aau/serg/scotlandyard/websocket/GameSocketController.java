@@ -3,8 +3,11 @@ package at.aau.serg.scotlandyard.websocket;
 
 
 import at.aau.serg.scotlandyard.gamelogic.GameManager;
+import at.aau.serg.scotlandyard.gamelogic.GameState;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import java.util.Map;
 
 @Controller
 public class GameSocketController {

@@ -11,6 +11,8 @@ import at.aau.serg.scotlandyard.gamelogic.GameManager;
 import org.slf4j.LoggerFactory;
 
 
+
+
 import java.util.*;
 
 
@@ -88,38 +90,50 @@ public class RoundManager {
 
         currentRound++;
     }
-    public void nextTurn(){
-        Player currentPlayer = getCurrentPlayer();
-
+    public void nextTurn() {
 
         currentPlayerTurn++;
         logger.info("Current Turn: {}", currentRound);
-        if(currentPlayerTurn >= turnOrder.size()){
+
+        if (currentPlayerTurn >= turnOrder.size()) {
             currentPlayerTurn = 0;
             currentRound++;
         }
 
         Player currentPlayer = getCurrentPlayer();
+
+
+        if (allDetectivesBlocked()) {
+            mrXwinByNoMoves = true;
+            logger.info("Alle Detectives sind blockiert – MrX gewinnt.");
+        }
+
+        // Bot automatisch bewegen
         if (currentPlayer.getName().startsWith("[BOT]")) {
-            logger.info(" Bot '{}' ist an der Reihe – führe automatischen Zug aus", currentPlayer.getName());
+            logger.info("🤖 Bot '{}' ist an der Reihe – führe automatischen Zug aus", currentPlayer.getName());
 
             new Thread(() -> {
                 try {
-                    Thread.sleep(3000); // 3 Sekunden Denkzeit
+                    Thread.sleep(3000); // Denkzeit
                 } catch (InterruptedException ignored) {}
 
                 BotLogic.executeBotMove(currentPlayer, gameState);
             }).start();
         }
-
-
-
-
-        if (currentPlayer==lastPlayerMoved) {
-                    mrXwinByNoMoves = true;
-        }
-
     }
+
+    private boolean allDetectivesBlocked() {
+        for (Detective d : detectives) {
+            List<Map.Entry<Integer, Ticket>> moves = gameState.getAllowedMoves(d.getName());
+            if (moves != null && !moves.isEmpty()) {
+                return false; // Mindestens ein Detective kann sich bewegen
+            }
+        }
+        return true; //alle blockiert
+    }
+
+
+
 
     public boolean mrXwinByNoMoves() {
         return mrXwinByNoMoves;
