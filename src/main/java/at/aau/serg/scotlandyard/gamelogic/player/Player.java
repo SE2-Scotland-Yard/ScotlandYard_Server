@@ -50,4 +50,32 @@ public abstract class Player {
         return pos;
     }
 
+    public List<Integer> allowedNextMoves(Board board) {
+        List<Integer> allowedMoves = new ArrayList<>();
+        for (Edge edge : board.getConnectionsFrom(this.pos)) {
+            Ticket requiredTicket = transportToTicket(edge.getTicket());
+            if (tickets.hasTicket(requiredTicket)) {
+                allowedMoves.add(edge.getTo());
+            }
+        }
+        return allowedMoves;
+    }
+
+    private Ticket transportToTicket(Ticket ticket) {
+       return ticket;
+    }
+
+
+    public void setPos(int pos) {
+        this.pos = pos;
+    }
+
+    public boolean isMrX() {
+        return this instanceof MrX;
+    }
+
+    public boolean isBot() {
+        return false; // Standardmäßig: kein Bot
+    }
+
 }

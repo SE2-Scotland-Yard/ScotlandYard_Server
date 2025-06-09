@@ -186,6 +186,7 @@ public class LobbySocketController {
     public void handleLeave(@Payload LeaveRequest request) {
         String gameId = request.getGameId();
         String playerId = request.getPlayerId();
+        System.out.println("Game leave received: " + gameId + ", " + playerId);
 
         Lobby lobby = lobbyManager.getLobby(gameId);
         if (lobby != null) {
@@ -202,7 +203,7 @@ public class LobbySocketController {
         Lobby lobby = lobbyManager.getLobby(gameId);
         if (lobby != null) {
             lobby.updateLastActivity(playerId);
-            logger.info("→ Ping erhalten von {}" , playerId);
+            logger.info("→ [LOBBY]Ping erhalten von {}" , playerId);
         }
     }
 

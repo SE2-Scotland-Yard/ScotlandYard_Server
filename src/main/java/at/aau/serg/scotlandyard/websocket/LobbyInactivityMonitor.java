@@ -12,14 +12,14 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 @Component
-public class InactivityMonitor {
+public class LobbyInactivityMonitor {
 
     private final LobbyManager lobbyManager;
     private final SimpMessagingTemplate messaging;
 
     private static final Logger logger = LoggerFactory.getLogger(InactivityMonitor.class);
 
-    public InactivityMonitor(LobbyManager lobbyManager, SimpMessagingTemplate messaging) {
+    public LobbyInactivityMonitor(LobbyManager lobbyManager, SimpMessagingTemplate messaging) {
         this.lobbyManager = lobbyManager;
         this.messaging = messaging;
     }

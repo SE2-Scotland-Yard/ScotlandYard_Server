@@ -1,5 +1,6 @@
 package at.aau.serg.scotlandyard.gamelogic;
 
+import at.aau.serg.scotlandyard.bot.BotLogic;
 import at.aau.serg.scotlandyard.dto.GameOverviewDTO;
 import at.aau.serg.scotlandyard.gamelogic.player.*;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.Ticket;
@@ -34,6 +35,7 @@ public class RoundManager {
     @Setter
     private Player lastPlayerMoved;
     private boolean mrXwinByNoMoves = false;
+    private GameState gameState;
 
     public RoundManager(List<Detective> detectives, MrX mrX) {
         this.detectives = detectives;
@@ -96,6 +98,23 @@ public class RoundManager {
             currentPlayerTurn = 0;
             currentRound++;
         }
+
+        Player currentPlayer = getCurrentPlayer();
+        if (currentPlayer.getName().startsWith("[BOT]")) {
+            logger.info(" Bot '{}' ist an der Reihe – führe automatischen Zug aus", currentPlayer.getName());
+
+            new Thread(() -> {
+                try {
+                    Thread.sleep(3000); // 3 Sekunden Denkzeit
+                } catch (InterruptedException ignored) {}
+
+                BotLogic.executeBotMove(currentPlayer, gameState);
+            }).start();
+        }
+
+
+
+
         if (currentPlayer==lastPlayerMoved) {
                     mrXwinByNoMoves = true;
         }
@@ -129,6 +148,42 @@ public class RoundManager {
     public void addMrXTicket(Ticket ticket){
         mrX.addTicket(ticket);
     }
+
+    public void replacePlayer(Player original, Player replacement) {
+        // In turnOrder ersetzen
+        for (int i = 0; i < turnOrder.size(); i++) {
+            if (turnOrder.get(i).equals(original)) {
+                turnOrder.set(i, replacement);
+
+                // Wenn der aktuelle Spieler ersetzt wurde, Index beibehalten
+                if (i == currentPlayerTurn) {
+                    currentPlayerTurn = i;
+                }
+                break;
+            }
+        }
+
+        // Falls es ein Detective ist, auch in der Liste der Detectives ersetzen
+        if (original instanceof Detective && replacement instanceof Detective) {
+            for (int i = 0; i < detectives.size(); i++) {
+                if (detectives.get(i).equals(original)) {
+                    detectives.set(i, (Detective) replacement);
+                    break;
+                }
+            }
+        }
+
+        logger.info("🔁 Spieler '{}' wurde in der Runde ersetzt durch '{}'.", original.getName(), replacement.getName());
+    }
+
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
+    }
+
+
+
+
+
 
 
 }

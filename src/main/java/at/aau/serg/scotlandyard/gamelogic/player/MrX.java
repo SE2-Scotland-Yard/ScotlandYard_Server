@@ -17,6 +17,11 @@ public class MrX extends Player {
         super(name, initializeTickets());
     }
 
+    public MrX(String name, int startPos, PlayerTickets tickets) {
+        super(name, tickets);
+        this.setPos(startPos);
+    }
+
     private static PlayerTickets initializeTickets() {
         Map<Ticket, Integer> initialTickets = new EnumMap<>(Ticket.class);
 
