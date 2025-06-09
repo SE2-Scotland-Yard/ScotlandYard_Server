@@ -9,8 +9,5 @@ public class BotDetective extends Detective {
         super(name, startPos, tickets);
     }
 
-    @Override
-    public boolean isBot() {
-        return true;
-    }
+
 }

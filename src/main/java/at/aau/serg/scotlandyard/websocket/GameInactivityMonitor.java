@@ -27,7 +27,7 @@ public class GameInactivityMonitor {
     @Scheduled(fixedRate = 60_000) // alle 60 Sekunden
     public void checkInactivePlayersInGame() {
         long now = System.currentTimeMillis();
-        long timeoutMillis = 4 * 60 * 1000;
+        long timeoutMillis = 3 * 60 * 1000;
 
         for (String gameId : gameManager.getAllGameIds()) {
             GameState game = gameManager.getGame(gameId);
@@ -44,18 +44,14 @@ public class GameInactivityMonitor {
             }
 
             for (String player : inactivePlayers) {
-                System.out.println("⚠️ Spieler im Spiel inaktiv: " + player + " in Game " + gameId);
+                System.out.println("Spieler im Spiel inaktiv: " + player + " in Game " + gameId);
 
                 Player bot = game.replaceWithBot(player);
 
-
                 if (bot == null) {
-                    sendSystemMessage(gameId, player + " hat das Spiel verlassen.");
                     continue;
                 }
 
-
-                sendSystemMessage(gameId, player + " wurde durch einen Bot ersetzt.");
 
 
                 if (game.getCurrentPlayerName().equals(bot.getName())) {
@@ -72,7 +68,5 @@ public class GameInactivityMonitor {
         }
     }
 
-    private void sendSystemMessage(String gameId, String message) {
-        messaging.convertAndSend("/topic/game/" + gameId + "/system", message);
-    }
+
 }

@@ -56,12 +56,19 @@ public class LobbyManager {
         if (lobby != null) {
             lobby.removePlayer(playerId);
 
-            // Wenn die Lobby leer ist → löschen
-            if (lobby.getPlayers().isEmpty()) {
+            Set<String> remainingPlayers = lobby.getPlayers();
+
+            boolean onlyBotsLeft = remainingPlayers.stream()
+                    .allMatch(name -> name != null && name.startsWith("[BOT]"));
+
+            if (remainingPlayers.isEmpty() || onlyBotsLeft) {
                 lobbies.remove(gameId);
+
             }
+
         }
     }
+
 
 
 

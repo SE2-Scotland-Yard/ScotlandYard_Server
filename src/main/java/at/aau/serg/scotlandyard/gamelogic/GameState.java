@@ -2,6 +2,7 @@ package at.aau.serg.scotlandyard.gamelogic;
 
 
 import at.aau.serg.scotlandyard.bot.BotFactory;
+import at.aau.serg.scotlandyard.bot.BotPlayer;
 import at.aau.serg.scotlandyard.dto.GameMapper;
 
 import at.aau.serg.scotlandyard.gamelogic.board.Board;
@@ -352,7 +353,7 @@ public class GameState {
         if (original == null) return null;
 
         // Wenn MrX geht, Spiel abbrechen (nicht durch Bot ersetzen)
-        if (original.isMrX()) {
+        if (original instanceof MrX) {
             messaging.convertAndSend("/topic/game/" + gameId + "/system", "mrX");
 
             // Spiel sofort löschen, weil MrX weg ist
@@ -401,7 +402,7 @@ public class GameState {
     }
 
     public boolean onlyBotsLeft() {
-        return players.values().stream().allMatch(Player::isBot);
+        return players.values().stream().allMatch(P -> P instanceof BotPlayer);
     }
 
 }

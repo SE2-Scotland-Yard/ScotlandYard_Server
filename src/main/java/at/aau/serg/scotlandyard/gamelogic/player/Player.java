@@ -12,16 +12,16 @@ import java.util.*;
 public abstract class Player {
     @Getter
     private final String name;
-   @Getter
-   protected final PlayerTickets tickets;
-   @Setter
-   private int pos;
+    @Getter
+    protected final PlayerTickets tickets;
+    @Setter
+    private int pos;
 
 
     protected Player(String name, PlayerTickets tickets) {
         this.name = name;
         this.tickets = tickets;
-        this.pos = new Random().nextInt(199)+1;
+        this.pos = new Random().nextInt(199) + 1;
     }
 
     public boolean isValidMove(int to, Ticket ticket, Board board) {
@@ -62,20 +62,9 @@ public abstract class Player {
     }
 
     private Ticket transportToTicket(Ticket ticket) {
-       return ticket;
+        return ticket;
     }
 
 
-    public void setPos(int pos) {
-        this.pos = pos;
-    }
-
-    public boolean isMrX() {
-        return this instanceof MrX;
-    }
-
-    public boolean isBot() {
-        return false; // Standardmäßig: kein Bot
-    }
 
 }
