@@ -5,6 +5,11 @@ import at.aau.serg.scotlandyard.gamelogic.player.tickets.PlayerTickets;
 
 public class BotFactory {
 
+    // Private constructor to prevent instantiation
+    private BotFactory() {
+        throw new UnsupportedOperationException("Utility class");
+    }
+
     public static Player createBotReplacement(Player original) {
         String name = original.getName();
         if (!name.startsWith("[BOT] ")) {
@@ -12,7 +17,7 @@ public class BotFactory {
         }
 
         int pos = original.getPosition();
-        PlayerTickets tickets = original.getTickets().copy(); //aktuelle tickets kopieren
+        PlayerTickets tickets = original.getTickets().copy();
 
         if (original instanceof MrX) {
             return new BotPlayer(name, pos, tickets);
