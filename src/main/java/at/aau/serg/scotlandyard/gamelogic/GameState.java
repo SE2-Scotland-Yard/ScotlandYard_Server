@@ -41,14 +41,17 @@ public class GameState {
     @Autowired
     private GameManager gameManager;
 
-
-
-
-
     public GameState(String gameId, SimpMessagingTemplate messaging) {
         this.board = new Board();
         this.gameId = gameId;
         this.messaging = messaging;
+    }
+
+    public GameState(String gameId, SimpMessagingTemplate messaging, GameManager gameManager) {
+        this.board = new Board();
+        this.gameId = gameId;
+        this.messaging = messaging;
+        this.gameManager = gameManager;
     }
 
     public void initRoundManager(List<Detective>detectives, MrX mrX){ //nicht ideal
@@ -67,7 +70,7 @@ public class GameState {
                         null,
                         players
 
-                    
+
 
                 )
         );
@@ -356,12 +359,16 @@ public class GameState {
         if (original instanceof MrX) {
             messaging.convertAndSend("/topic/game/" + gameId + "/system", "mrX");
 
-            // Spiel sofort löschen, weil MrX weg ist
-            gameManager.removeGame(gameId);
+            if (gameManager != null) {
+                gameManager.removeGame(gameId);
+            } else {
+                logger.warn("⚠️ GameManager is null – vermutlich Testkontext.");
+            }
 
             System.out.println("MrX hat das Spiel verlassen – Game " + gameId + " wurde entfernt.");
             return null;
         }
+
 
 
         // Bot erzeugen und Spieler ersetzen

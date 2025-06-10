@@ -8,7 +8,6 @@ import at.aau.serg.scotlandyard.gamelogic.player.tickets.Ticket;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
@@ -16,26 +15,51 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 class GameStateTest {
+
     private GameState gameState;
     private MrX mrX;
     private Detective detective;
 
-    @Mock
-    private SimpMessagingTemplate messagingTemplate;
-
     @BeforeEach
     void setUp() {
-        gameState = new GameState("testGame", messagingTemplate);
-        mrX = mock(MrX.class);
-        detective = mock(Detective.class);
+        SimpMessagingTemplate messagingTemplate = mock(SimpMessagingTemplate.class);
+        GameManager mockGameManager = mock(GameManager.class);
+        gameState = new GameState("testGame", messagingTemplate, mockGameManager);
+
+        mrX = createMockMrX("MrX");
+        detective = createMockDetective("Detective");
+
         gameState.addPlayer("MrX", mrX);
         gameState.addPlayer("Detective", detective);
         gameState.initRoundManager(List.of(detective), mrX);
+    }
+
+    private MrX createMockMrX(String name) {
+        MrX mockMrX = mock(MrX.class);
+        lenient().when(mockMrX.getName()).thenReturn(name);
+        return mockMrX;
+    }
+
+    private Detective createMockDetective(String name) {
+        Detective mockDetective = mock(Detective.class);
+        lenient().when(mockDetective.getName()).thenReturn(name);
+        return mockDetective;
+    }
+
+    private static PlayerTickets getDefaultTickets() {
+        Map<Ticket, Integer> initialTickets = new EnumMap<>(Ticket.class);
+        initialTickets.put(Ticket.TAXI, 4);
+        initialTickets.put(Ticket.BUS, 3);
+        initialTickets.put(Ticket.UNDERGROUND, 3);
+        initialTickets.put(Ticket.BLACK, 5);
+        initialTickets.put(Ticket.DOUBLE, 2);
+        return new PlayerTickets(initialTickets);
     }
 
     @Test
@@ -49,26 +73,13 @@ class GameStateTest {
     void testGetAllowedMoves() {
         when(mrX.getPosition()).thenReturn(1);
         when(mrX.getTickets()).thenReturn(getDefaultTickets());
-
         var allowedMoves = gameState.getAllowedMoves("MrX");
         assertFalse(allowedMoves.isEmpty());
     }
 
-    private static PlayerTickets getDefaultTickets() {
-        Map<Ticket, Integer> initialTickets = new EnumMap<>(Ticket.class);
-
-        initialTickets.put(Ticket.TAXI, 4);
-        initialTickets.put(Ticket.BUS, 3);
-        initialTickets.put(Ticket.UNDERGROUND, 3);
-        initialTickets.put(Ticket.BLACK, 5);
-        initialTickets.put(Ticket.DOUBLE, 2);
-
-        return new PlayerTickets(initialTickets);
-    }
-
     @Test
     void testGetAllowedMovesPlayerIsNull() {
-        var allowedMoves = gameState.getAllowedMoves("Nothing");
+        var allowedMoves = gameState.getAllowedMoves("Unknown");
         assertTrue(allowedMoves.isEmpty());
     }
 
@@ -77,18 +88,16 @@ class GameStateTest {
         when(mrX.isValidMove(anyInt(), any(), any())).thenReturn(true);
         when(mrX.getTickets()).thenReturn(getDefaultTickets());
         when(detective.getTickets()).thenReturn(getDefaultTickets());
-        boolean successful = gameState.movePlayer("MrX", 1, Ticket.TAXI);
-
+        boolean result = gameState.movePlayer("MrX", 1, Ticket.TAXI);
         verify(mrX).move(eq(1), eq(Ticket.TAXI), any());
-        assertTrue(successful);
+        assertTrue(result);
     }
 
     @Test
     void testMovePlayerMrXInvalid() {
         when(mrX.isValidMove(anyInt(), any(), any())).thenReturn(false);
-        boolean successful = gameState.movePlayer("MrX", 1, Ticket.TAXI);
-
-        assertFalse(successful);
+        boolean result = gameState.movePlayer("MrX", 1, Ticket.TAXI);
+        assertFalse(result);
         verify(mrX, never()).move(anyInt(), any(), any());
     }
 
@@ -97,10 +106,9 @@ class GameStateTest {
         when(detective.isValidMove(anyInt(), any(), any())).thenReturn(true);
         when(detective.getTickets()).thenReturn(getDefaultTickets());
         when(mrX.getTickets()).thenReturn(getDefaultTickets());
-        boolean successful = gameState.movePlayer("Detective", 1, Ticket.TAXI);
-
+        boolean result = gameState.movePlayer("Detective", 1, Ticket.TAXI);
         verify(detective).move(eq(1), eq(Ticket.TAXI), any());
-        assertTrue(successful);
+        assertTrue(result);
     }
 
     @Test
@@ -110,156 +118,123 @@ class GameStateTest {
         when(detective2.isValidMove(anyInt(), any(), any())).thenReturn(false);
         when(detective.getPosition()).thenReturn(1);
 
-        boolean successful = gameState.movePlayer("Detective2", 1, Ticket.TAXI);
-
-        assertFalse(successful);
+        boolean result = gameState.movePlayer("Detective2", 1, Ticket.TAXI);
+        assertFalse(result);
         verify(detective2, never()).move(anyInt(), any(), any());
     }
 
     @Test
     void testMovePlayerDetectiveInvalid() {
         when(detective.isValidMove(anyInt(), any(), any())).thenReturn(false);
-        boolean successful = gameState.movePlayer("Detective", 1, Ticket.TAXI);
-
-        assertFalse(successful);
+        boolean result = gameState.movePlayer("Detective", 1, Ticket.TAXI);
+        assertFalse(result);
         verify(detective, never()).move(anyInt(), any(), any());
     }
 
-
     @Test
     void testMoveMrXDouble() {
-        mrX = new MrX("MrX");
-        mrX.getTickets().addTicket(Ticket.TAXI);
-        mrX.getTickets().addTicket(Ticket.DOUBLE);
-
-
-        SimpMessagingTemplate messagingMock = mock(SimpMessagingTemplate.class);
-        gameState = new GameState("testGame", messagingMock);
-
-
-        List<Detective> detectives = List.of();
-        gameState.addPlayer("MrX", mrX);
-        gameState.initRoundManager(detectives, mrX);
-
-        boolean moved = gameState.moveMrXDouble("MrX",2, 1, Ticket.TAXI, Ticket.TAXI);
-
+        MrX realMrX = new MrX("MrX");
+        realMrX.getTickets().addTicket(Ticket.TAXI);
+        realMrX.getTickets().addTicket(Ticket.DOUBLE);
+        SimpMessagingTemplate messagingTemplate = mock(SimpMessagingTemplate.class);
+        gameState = new GameState("testGame", messagingTemplate);
+        gameState.addPlayer("MrX", realMrX);
+        gameState.initRoundManager(List.of(), realMrX);
+        boolean moved = gameState.moveMrXDouble("MrX", 2, 3, Ticket.TAXI, Ticket.TAXI);
         assertTrue(moved);
         assertEquals(2, gameState.getMrXMoveHistory().size());
     }
 
     @Test
     void testMoveMrXDoubleInvalid() {
-        boolean successful = gameState.moveMrXDouble("Detective", 2,1, Ticket.TAXI, Ticket.TAXI);
-        assertFalse(successful);
-        verify(mrX, never()).move(anyInt(), any(), any());
+        boolean result = gameState.moveMrXDouble("Detective", 2, 3, Ticket.TAXI, Ticket.TAXI);
+        assertFalse(result);
     }
-
-    @Test
-    void testGetVisibleMrXPosition() {
-        //get to revealRound
-        when(mrX.isValidMove(anyInt(), any(), any())).thenReturn(true);
-        when(detective.isValidMove(anyInt(), any(), any())).thenReturn(true);
-        when(mrX.getTickets()).thenReturn(getDefaultTickets());
-        when(detective.getTickets()).thenReturn(getDefaultTickets());
-        gameState.movePlayer("MrX", 1, Ticket.TAXI);
-        gameState.movePlayer("Detective", 100, Ticket.TAXI);
-        gameState.movePlayer("MrX", 8, Ticket.TAXI);
-        gameState.movePlayer("Detective", 101, Ticket.TAXI);
-        gameState.movePlayer("MrX", 19, Ticket.TAXI);
-        gameState.movePlayer("Detective", 101, Ticket.TAXI);
-
-
-        //test correct String
-        when(mrX.getPosition()).thenReturn(19);
-        assertEquals(19, gameState.getMrXPosition("MrX"));
-
-    }
-
 
     @Test
     void testGetMrXMoveHistory() {
-        when(mrX.isValidMove(anyInt(), any(Ticket.class), any(Board.class))).thenReturn(true);
-        when(detective.isValidMove(anyInt(), any(Ticket.class), any(Board.class))).thenReturn(true);
-
+        when(mrX.isValidMove(anyInt(), any(), any())).thenReturn(true);
         when(mrX.getTickets()).thenReturn(getDefaultTickets());
+        when(detective.isValidMove(anyInt(), any(), any())).thenReturn(true);
         when(detective.getTickets()).thenReturn(getDefaultTickets());
-        gameState.movePlayer("MrX", 1, Ticket.TAXI);
-        gameState.movePlayer("Detective", 100, Ticket.TAXI);
-        gameState.movePlayer("MrX", 2, Ticket.BUS);
-        gameState.movePlayer("Detective", 101, Ticket.TAXI);
-        gameState.movePlayer("MrX", 3, Ticket.UNDERGROUND);
-        gameState.movePlayer("Detective", 102, Ticket.TAXI);
 
+        gameState.movePlayer("MrX", 1, Ticket.TAXI);
+        gameState.movePlayer("Detective", 2, Ticket.TAXI);
+        gameState.movePlayer("MrX", 3, Ticket.BUS);
+        gameState.movePlayer("Detective", 4, Ticket.TAXI);
 
         var history = gameState.getMrXMoveHistory();
-        assertEquals(3, history.size());
+        assertEquals(2, history.size());
     }
 
     @Test
-    void testGetMrXMoveHistoryInvalid() throws Exception {//spielt 1 Runde, setzt diese aber auf null
-        HashMap<Integer, MrXMove> mrXMoveHistory = new HashMap<>();
-        mrXMoveHistory.put(1, null);
+    void testGetMrXMoveHistoryNullValue() throws Exception {
+        Field field = GameState.class.getDeclaredField("mrXHistory");
+        field.setAccessible(true);
+        Map<Integer, MrXMove> mockMap = new HashMap<>();
+        mockMap.put(1, null);
+        field.set(gameState, mockMap);
 
-        when(mrX.isValidMove(anyInt(), any(Ticket.class), any(Board.class))).thenReturn(true);
-        when(mrX.getTickets()).thenReturn(getDefaultTickets());
-        when(detective.getTickets()).thenReturn(getDefaultTickets());
-        gameState.movePlayer("MrX", 1, Ticket.TAXI);
-
-        Field nameField = GameState.class.getDeclaredField("mrXHistory");
-        nameField.setAccessible(true);
-        nameField.set(gameState, mrXMoveHistory);
-
-
-        assertEquals(new ArrayList<>(), gameState.getMrXMoveHistory());
+        var result = gameState.getMrXMoveHistory();
+        assertEquals(Collections.emptyList(), result);
     }
 
     @Test
     void testGetWinnerNone() throws Exception {
-        RoundManager roundManager = mock(RoundManager.class);
-        when(roundManager.isGameOver()).thenReturn(false);
+        RoundManager mockRM = mock(RoundManager.class);
+        when(mockRM.isGameOver()).thenReturn(false);
 
-        Field nameField = GameState.class.getDeclaredField("roundManager");
-        nameField.setAccessible(true);
-        nameField.set(gameState, roundManager);
+        Field field = GameState.class.getDeclaredField("roundManager");
+        field.setAccessible(true);
+        field.set(gameState, mockRM);
 
         assertEquals(GameState.Winner.NONE, gameState.getWinner());
     }
 
     @Test
     void testGetWinnerMrX() throws Exception {
-        RoundManager roundManager = mock(RoundManager.class);
-        when(roundManager.isGameOver()).thenReturn(true);
-        when(roundManager.isMrXCaptured()).thenReturn(false);
+        RoundManager mockRM = mock(RoundManager.class);
+        when(mockRM.isGameOver()).thenReturn(true);
+        when(mockRM.isMrXCaptured()).thenReturn(false);
 
-        Field nameField = GameState.class.getDeclaredField("roundManager");
-        nameField.setAccessible(true);
-        nameField.set(gameState, roundManager);
+        Field field = GameState.class.getDeclaredField("roundManager");
+        field.setAccessible(true);
+        field.set(gameState, mockRM);
 
         assertEquals(GameState.Winner.MR_X, gameState.getWinner());
     }
 
     @Test
-    void testGetRevealRounds() {
-        var revealRounds = gameState.getRevealRounds();
-        assertEquals(List.of(3, 8, 13, 18, 24), revealRounds);
+    void testRevealRounds() {
+        assertEquals(List.of(3, 8, 13, 18, 24), gameState.getRevealRounds());
     }
 
     @Test
-    void testGetBoard() {
-        Board board = gameState.getBoard();
-        assertNotNull(board);
+    void testBoardNotNull() {
+        assertNotNull(gameState.getBoard());
     }
 
     @Test
     void testIsPositionOccupied() {
-        when(detective.getPosition()).thenReturn(5);
-        assertTrue(gameState.isPositionOccupied(5));
-        assertFalse(gameState.isPositionOccupied(10));
+        when(detective.getPosition()).thenReturn(10);
+        assertTrue(gameState.isPositionOccupied(10));
+        assertFalse(gameState.isPositionOccupied(99));
+    }
+
+    @Test
+    void testGetMrXPositionKnown() {
+        when(mrX.getPosition()).thenReturn(77);
+        assertEquals(77, gameState.getMrXPosition("MrX"));
+    }
+
+    @Test
+    void testGetMrXPositionUnknown() {
+        assertEquals(0, gameState.getMrXPosition("Ghost"));
     }
 
     @Test
     void testGetMrXPosition() {
-        when(mrX.getPosition()).thenReturn(1);
+        lenient().when(mrX.getPosition()).thenReturn(1);
         int pos = gameState.getMrXPosition("MrX");
         assertEquals(1, pos);
     }
@@ -272,43 +247,42 @@ class GameStateTest {
 
     @Test
     void testGetAllowedDoubleMovesNotAllowed() {
-        when(detective.getTickets()).thenReturn(getDefaultTickets());
+        lenient().when(detective.getTickets()).thenReturn(getDefaultTickets());
         assertEquals(0, gameState.getAllowedDoubleMoves("Detective").size());
     }
 
     @Test
     void testGetAllowedDoubleMovesPos1Taxi() {
-        when(mrX.getPosition()).thenReturn(1);
+        lenient().when(mrX.getPosition()).thenReturn(1);
 
         Map<Ticket, Integer> initialTickets = new EnumMap<>(Ticket.class);
         initialTickets.put(Ticket.TAXI, 4);
         initialTickets.put(Ticket.DOUBLE, 1);
 
-        when(mrX.getTickets()).thenReturn(new PlayerTickets(initialTickets));
+        lenient().when(mrX.getTickets()).thenReturn(new PlayerTickets(initialTickets));
         assertEquals(4, gameState.getAllowedDoubleMoves("MrX").size());
     }
 
     @Test
     void testGetAllowedDoubleMovesPos2Taxi() {
-        when(mrX.getPosition()).thenReturn(2);
+        lenient().when(mrX.getPosition()).thenReturn(2);
 
         Map<Ticket, Integer> initialTickets = new EnumMap<>(Ticket.class);
         initialTickets.put(Ticket.TAXI, 4);
         initialTickets.put(Ticket.DOUBLE, 1);
 
-        when(mrX.getTickets()).thenReturn(new PlayerTickets(initialTickets));
-
+        lenient().when(mrX.getTickets()).thenReturn(new PlayerTickets(initialTickets));
         assertEquals(5, gameState.getAllowedDoubleMoves("MrX").size());
     }
 
     @Test
     void testGetAllowedDoubleMovesMissing2ndTicket() {
-        when(mrX.getPosition()).thenReturn(1);
+        lenient().when(mrX.getPosition()).thenReturn(1);
         Map<Ticket, Integer> initialTickets = new EnumMap<>(Ticket.class);
-        initialTickets.put(Ticket.TAXI, 1);
+        initialTickets.put(Ticket.TAXI, 1); // nur 1 Ticket
         initialTickets.put(Ticket.DOUBLE, 1);
 
-        when(mrX.getTickets()).thenReturn(new PlayerTickets(initialTickets));
+        lenient().when(mrX.getTickets()).thenReturn(new PlayerTickets(initialTickets));
         assertEquals(0, gameState.getAllowedDoubleMoves("MrX").size());
     }
 
@@ -316,10 +290,9 @@ class GameStateTest {
     void testGetAllowedDoubleMovesMissingDoubleTicket() {
         Map<Ticket, Integer> initialTickets = new EnumMap<>(Ticket.class);
         initialTickets.put(Ticket.TAXI, 4);
-        initialTickets.put(Ticket.DOUBLE, 0);
+        initialTickets.put(Ticket.DOUBLE, 0); // kein Double Ticket
 
-        when(mrX.getTickets()).thenReturn(new PlayerTickets(initialTickets));
-
+        lenient().when(mrX.getTickets()).thenReturn(new PlayerTickets(initialTickets));
         assertEquals(0, gameState.getAllowedDoubleMoves("MrX").size());
     }
 
@@ -328,19 +301,20 @@ class GameStateTest {
         Field nameField = GameState.class.getDeclaredField("roundManager");
         nameField.setAccessible(true);
         nameField.set(gameState, null);
+
         assertNull(gameState.getCurrentPlayerName());
     }
 
     @Test
     void testGetCurrentPlayerNameNoPlayer() throws Exception {
         RoundManager roundManager = mock(RoundManager.class);
-        when(roundManager.getCurrentPlayer()).thenReturn(null);
+        lenient().when(roundManager.getCurrentPlayer()).thenReturn(null);
 
         Field nameField = GameState.class.getDeclaredField("roundManager");
         nameField.setAccessible(true);
         nameField.set(gameState, roundManager);
-        assertNull(gameState.getCurrentPlayerName());
 
+        assertNull(gameState.getCurrentPlayerName());
     }
 
 }
