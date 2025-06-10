@@ -34,6 +34,10 @@ public class PlayerTickets {
         return Map.copyOf(tickets); // unveränderlich
     }
 
+    public PlayerTickets copy() {
+        return new PlayerTickets(new EnumMap<>(this.tickets));
+    }
+
 }
 
 

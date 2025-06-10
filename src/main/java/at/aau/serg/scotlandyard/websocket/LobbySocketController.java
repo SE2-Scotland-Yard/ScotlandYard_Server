@@ -186,6 +186,7 @@ public class LobbySocketController {
     public void handleLeave(@Payload LeaveRequest request) {
         String gameId = request.getGameId();
         String playerId = request.getPlayerId();
+        System.out.println("Game leave received: " + gameId + ", " + playerId);
 
         Lobby lobby = lobbyManager.getLobby(gameId);
         if (lobby != null) {
@@ -202,36 +203,57 @@ public class LobbySocketController {
         Lobby lobby = lobbyManager.getLobby(gameId);
         if (lobby != null) {
             lobby.updateLastActivity(playerId);
-            logger.info("→ Ping erhalten von {}" , playerId);
+            logger.info("→ [LOBBY]Ping erhalten von {}" , playerId);
+        }
+    }
+
+    @MessageMapping("/lobby/add-bot")
+    public void handleAddBot(@Payload AddBotMessage msg) {
+        String gameId = msg.getGameId();
+        Lobby lobby = lobbyManager.getLobby(gameId);
+        if (lobby == null) return;
+
+        // Bot-Namen erzeugen
+        int botIndex = 1;
+        String botName;
+        do {
+            botName = "[BOT] " + botIndex++;
+        } while (lobby.getPlayers().contains(botName));
+
+        // Bot zur Lobby hinzufügen
+        lobby.addPlayer(botName);
+        lobby.selectRole(botName, Role.DETECTIVE);
+        lobby.markReady(botName);
+
+        messaging.convertAndSend("/topic/lobby/" + gameId, LobbyMapper.toLobbyState(lobby));
+        logger.info(" Bot '{}' zur Lobby {} hinzugefügt", botName, gameId);
+    }
+
+    @MessageMapping("/lobby/remove-bot")
+    public void handleRemoveBot(@Payload RemoveBotMessage msg) {
+        String gameId = msg.getGameId();
+        Lobby lobby = lobbyManager.getLobby(gameId);
+        if (lobby == null) return;
+
+        // Finde den zuletzt hinzugefügten Bot (höchste Nummer)
+        String botToRemove = lobby.getPlayers().stream()
+                .filter(name -> name.startsWith("[BOT] "))
+                .sorted((a, b) -> {
+                    int numA = Integer.parseInt(a.replace("[BOT] ", ""));
+                    int numB = Integer.parseInt(b.replace("[BOT] ", ""));
+                    return Integer.compare(numB, numA); // absteigend
+                })
+                .findFirst()
+                .orElse(null);
+
+        if (botToRemove != null) {
+            lobby.removePlayer(botToRemove);
+            messaging.convertAndSend("/topic/lobby/" + gameId, LobbyMapper.toLobbyState(lobby));
+            logger.info("Bot '{}' aus Lobby {} entfernt", botToRemove, gameId);
         }
     }
 
 
 
-
-
-
-
-
-    @MessageMapping("/game/requestOwnPosition")
-    public void handleOwnPositionRequest(Map<String, String> request) {
-        String gameId = request.get("gameId");
-        String playerId = request.get("playerId");
-
-        GameState game = gameManager.getGame(gameId);
-        if (game == null) return;
-
-        Player player = game.getAllPlayers().get(playerId);
-        if (player != null) {
-            int position = player.getPosition();
-
-            messaging.convertAndSend("/topic/ownPosition/" + playerId, Map.of("position", position));
-
-
-
-
-            logger.info("→ Eigene Position an MrX gesendet: {}", position);
-        }
-    }
 
 }

@@ -12,14 +12,14 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 @Component
-public class InactivityMonitor {
+public class LobbyInactivityMonitor {
 
     private final LobbyManager lobbyManager;
     private final SimpMessagingTemplate messaging;
 
-    private static final Logger logger = LoggerFactory.getLogger(InactivityMonitor.class);
+    private static final Logger logger = LoggerFactory.getLogger(LobbyInactivityMonitor.class);
 
-    public InactivityMonitor(LobbyManager lobbyManager, SimpMessagingTemplate messaging) {
+    public LobbyInactivityMonitor(LobbyManager lobbyManager, SimpMessagingTemplate messaging) {
         this.lobbyManager = lobbyManager;
         this.messaging = messaging;
     }
@@ -37,6 +37,9 @@ public class InactivityMonitor {
             List<String> toKick = new ArrayList<>();
 
             for (String player : new ArrayList<>(lobby.getPlayers())) {
+                if (isBot(player)) {
+                    continue; // Bots NICHT entfernen
+                }
                 long lastActive = lobby.getLastActivity(player);
                 if (now - lastActive > timeoutMillis) {
                     toKick.add(player);
@@ -48,14 +51,17 @@ public class InactivityMonitor {
                 logger.info("Inaktiver Spieler entfernt: {}", player);
             }
 
-            // Sende Update an alle Clients
+            // Update an Clients
             messaging.convertAndSend("/topic/lobby/" + gameId, LobbyMapper.toLobbyState(lobby));
 
-            // Lobby löschen, wenn leer
-            if (lobby.getPlayers().isEmpty()) {
+            // Lösche die Lobby, wenn leer oder nur Bots
+            boolean allBots = lobby.getPlayers().stream().allMatch(this::isBot);
+            if (lobby.getPlayers().isEmpty() || allBots) {
                 lobbiesToRemove.add(gameId);
+                logger.info("Lobby '{}' gelöscht, weil leer oder nur Bots vorhanden.", gameId);
             }
         }
+
 
         // Nach dem Durchlauf entfernen
         for (String gameId : lobbiesToRemove) {
@@ -63,4 +69,9 @@ public class InactivityMonitor {
             logger.info("Leere Lobby gelöscht: {}", gameId);
         }
     }
+
+    private boolean isBot(String playerName) {
+        return playerName != null && playerName.startsWith("[BOT]");
+    }
+
 }

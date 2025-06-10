@@ -25,6 +25,9 @@ class RoundManagerTest {
 
     @Mock
     private MrX mrX;
+    @Mock
+    private GameState gameState;
+
 
     private RoundManager roundManager;
 
@@ -47,6 +50,7 @@ class RoundManagerTest {
         detectives.add(detective2);
 
         roundManager = new RoundManager(detectives,mrX);
+        roundManager.setGameState(gameState);
 
     }
 

@@ -13,6 +13,12 @@ public class Detective extends Player {
 
     }
 
+    //für bots
+    public Detective(String name, int startPos, PlayerTickets tickets) {
+        super(name, tickets);
+        this.setPos(startPos);
+    }
+
     private static PlayerTickets initializeTickets() {
         Map<Ticket, Integer> initialTickets = new EnumMap<>(Ticket.class);
         initialTickets.put(Ticket.TAXI, 10);

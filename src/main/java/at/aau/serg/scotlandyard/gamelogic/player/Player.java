@@ -12,16 +12,16 @@ import java.util.*;
 public abstract class Player {
     @Getter
     private final String name;
-   @Getter
-   protected final PlayerTickets tickets;
-   @Setter
-   private int pos;
+    @Getter
+    protected final PlayerTickets tickets;
+    @Setter
+    private int pos;
 
 
     protected Player(String name, PlayerTickets tickets) {
         this.name = name;
         this.tickets = tickets;
-        this.pos = new Random().nextInt(199)+1;
+        this.pos = new Random().nextInt(199) + 1;
     }
 
     public boolean isValidMove(int to, Ticket ticket, Board board) {
@@ -49,5 +49,22 @@ public abstract class Player {
     public int getPosition() {
         return pos;
     }
+
+    public List<Integer> allowedNextMoves(Board board) {
+        List<Integer> allowedMoves = new ArrayList<>();
+        for (Edge edge : board.getConnectionsFrom(this.pos)) {
+            Ticket requiredTicket = transportToTicket(edge.getTicket());
+            if (tickets.hasTicket(requiredTicket)) {
+                allowedMoves.add(edge.getTo());
+            }
+        }
+        return allowedMoves;
+    }
+
+    private Ticket transportToTicket(Ticket ticket) {
+        return ticket;
+    }
+
+
 
 }

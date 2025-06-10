@@ -1,6 +1,7 @@
 package at.aau.serg.scotlandyard.controller;
 
 import at.aau.serg.scotlandyard.dto.GameOverviewDTO;
+import at.aau.serg.scotlandyard.dto.LeaveGameRequest;
 import at.aau.serg.scotlandyard.gamelogic.GameManager;
 import at.aau.serg.scotlandyard.gamelogic.GameState;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.Ticket;
@@ -274,5 +275,18 @@ public class GameController {
             default:
                 return "Spiel läuft noch.";
         }
+    }
+    @PostMapping("/{gameId}/leave")
+    public ResponseEntity<Void> leaveGame(
+            @PathVariable String gameId,
+            @RequestBody LeaveGameRequest req) {
+
+        GameState game = gameManager.getGame(gameId);
+        if (game == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        game.replaceWithBot(req.getPlayerId());
+        return ResponseEntity.ok().build();
     }
 }
