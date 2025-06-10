@@ -8,6 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 public class BotLogic {
+
+    // Privater Konstruktor verhindert Instanziierung
+    private BotLogic() {
+        throw new UnsupportedOperationException("Utility class");
+    }
     public static Map.Entry<Integer, Ticket> decideMove(String playerName, GameState gameState) {
         List<Map.Entry<Integer, Ticket>> moves = gameState.getAllowedMoves(playerName);
         return moves.isEmpty() ? null : moves.get(0);
