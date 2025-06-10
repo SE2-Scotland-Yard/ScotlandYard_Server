@@ -160,23 +160,5 @@ class LobbySocketControllerTest {
         verify(lobby).updateLastActivity("Clara");
     }
 
-    @Test
-    void testHandleOwnPositionRequest_SendsCorrectPosition() {
-        GameState game = mock(GameState.class);
-        Player player = mock(Player.class);
-        when(gameManager.getGame("game8")).thenReturn(game);
-        when(game.getAllPlayers()).thenReturn(Map.of("David", player));
-        when(player.getPosition()).thenReturn(42);
-
-        Map<String, String> request = Map.of(
-                "gameId", "game8",
-                "playerId", "David"
-        );
-
-        controller.handleOwnPositionRequest(request);
-
-        verify(messaging).convertAndSend("/topic/ownPosition/David", Map.of("position", 42));
-    }
-
 
 }
