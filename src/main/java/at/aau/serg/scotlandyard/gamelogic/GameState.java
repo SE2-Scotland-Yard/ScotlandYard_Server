@@ -293,7 +293,6 @@ public class GameState {
         }
         List<Map.Entry<Integer, String>> result = new ArrayList<>();
         int currentPos = p.getPosition();
-
         List<Edge> firstMoves = board.getConnectionsFrom(currentPos)
                 .stream()
                 .filter(edge -> p.getTickets().hasTicket(edge.getTicket()))
@@ -410,6 +409,92 @@ public class GameState {
 
     public boolean onlyBotsLeft() {
         return players.values().stream().allMatch(P -> P instanceof BotPlayer);
+    }
+
+    public List <Map.Entry<Integer, Ticket>> getShortestMoveTo(String playername) {
+        if (playername == null) {
+            logger.warn("Player name is null");
+            return null;
+        }
+
+        Player player = players.get(playername);
+        if (player == null) {
+            logger.warn("Player {} not found", playername);
+            return null;
+        }
+        int to = getMrXPosition();
+        int from = player.getPosition();
+        logger.info("🔍 Starting shortest path calculation for {} from {} to {}", player.getName(), from, to);
+        logger.debug("Player tickets: {}", player.getTickets());
+
+        Map<Integer, Integer> distances = new HashMap<>();
+        Map<Integer, Map.Entry<Integer, Ticket>> predecessors = new HashMap<>();
+        PriorityQueue<Integer> queue = new PriorityQueue<>(Comparator.comparingInt(distances::get));
+
+        distances.put(from, 0);
+        queue.add(from);
+
+        while (!queue.isEmpty()) {
+            int current = queue.poll();
+
+            if (current == to) {
+                logger.debug("Target position {} reached", to);
+                break;
+            }
+
+            for (Edge edge : board.getConnectionsFrom(current)) {
+                if (!player.getTickets().hasTicket(edge.getTicket())) {
+                    logger.trace("Skipping edge {}->{} - missing {} ticket", current, edge.getTo(), edge.getTicket());
+                    continue;
+                }
+
+                if (player instanceof Detective && isPositionOccupied(edge.getTo())) {
+                    logger.debug("Skipping occupied position {}", edge.getTo());
+                    continue;
+                }
+
+                int newDist = distances.getOrDefault(current, Integer.MAX_VALUE) + 1;
+
+                if (newDist < distances.getOrDefault(edge.getTo(), Integer.MAX_VALUE)) {
+                    logger.trace("Found better path to {} via {} (distance: {})",
+                            edge.getTo(), current, newDist);
+                    distances.put(edge.getTo(), newDist);
+                    predecessors.put(edge.getTo(), Map.entry(current, edge.getTicket()));
+                    queue.remove(edge.getTo());
+                    queue.add(edge.getTo());
+                }
+            }
+        }
+
+        if (!distances.containsKey(to)) {
+            logger.info("❌ No valid path found from {} to {} for {}", from, to, player.getName());
+            return null;
+        }
+
+        if (from == to) {
+            logger.warn("⚠️ Already at target position {}", to);
+            return null;
+        }
+
+        int current = to;
+        while (predecessors.get(current).getKey() != from) {
+            current = predecessors.get(current).getKey();
+        }
+
+        Map.Entry<Integer, Ticket> nextMove = Map.entry(current, predecessors.get(current).getValue());
+
+        logger.info("✅ Next move for {}: move to {} using {} ticket",
+                player.getName(), nextMove.getKey(), nextMove.getValue());
+
+        return Collections.singletonList(nextMove);
+    }
+    public Integer getMrXPosition() {
+        for (Player p : players.values()) {
+            if (p instanceof MrX) {
+                return p.getPosition();
+            }
+        }
+        return null;
     }
 
 }

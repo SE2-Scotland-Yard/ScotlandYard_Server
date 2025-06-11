@@ -9,7 +9,8 @@ import java.util.Map;
 
 public class BotLogic {
     public static Map.Entry<Integer, Ticket> decideMove(String playerName, GameState gameState) {
-        List<Map.Entry<Integer, Ticket>> moves = gameState.getAllowedMoves(playerName);
+
+        List<Map.Entry<Integer, Ticket>> moves = gameState.getShortestMoveTo(playerName);
         return moves.isEmpty() ? null : moves.get(0);
     }
 
