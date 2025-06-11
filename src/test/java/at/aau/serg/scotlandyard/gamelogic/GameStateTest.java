@@ -3,6 +3,7 @@ package at.aau.serg.scotlandyard.gamelogic;
 import at.aau.serg.scotlandyard.gamelogic.board.Board;
 import at.aau.serg.scotlandyard.gamelogic.player.Detective;
 import at.aau.serg.scotlandyard.gamelogic.player.MrX;
+import at.aau.serg.scotlandyard.gamelogic.player.Player;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.PlayerTickets;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.Ticket;
 import org.junit.jupiter.api.BeforeEach;
@@ -110,6 +111,7 @@ class GameStateTest {
         verify(detective).move(eq(1), eq(Ticket.TAXI), any());
         assertTrue(result);
     }
+
 
     @Test
     void testMovePlayerDetectivePositionTaken() {
@@ -279,7 +281,7 @@ class GameStateTest {
     void testGetAllowedDoubleMovesMissing2ndTicket() {
         lenient().when(mrX.getPosition()).thenReturn(1);
         Map<Ticket, Integer> initialTickets = new EnumMap<>(Ticket.class);
-        initialTickets.put(Ticket.TAXI, 1); // nur 1 Ticket
+        initialTickets.put(Ticket.TAXI, 1);
         initialTickets.put(Ticket.DOUBLE, 1);
 
         lenient().when(mrX.getTickets()).thenReturn(new PlayerTickets(initialTickets));
@@ -317,6 +319,63 @@ class GameStateTest {
         assertNull(gameState.getCurrentPlayerName());
     }
 
+    @Test
+    void testUpdateLastActivity_AddsNewTimestamp() {
+        String playerId = "player1";
+        long beforeUpdate = System.currentTimeMillis();
+
+        gameState.updateLastActivity(playerId);
+        Map<String, Long> result = gameState.getLastActivityMap();
+
+        assertTrue(result.containsKey(playerId));
+        assertTrue(result.get(playerId) >= beforeUpdate);
+    }
+
+    @Test
+    void testUpdateLastActivity_UpdatesExistingTimestamp() throws InterruptedException {
+        String playerId = "player1";
+        gameState.updateLastActivity(playerId);
+        long firstTimestamp = gameState.getLastActivityMap().get(playerId);
+
+        Thread.sleep(10);
+        gameState.updateLastActivity(playerId);
+        long secondTimestamp = gameState.getLastActivityMap().get(playerId);
+
+        assertTrue(secondTimestamp > firstTimestamp);
+    }
+
+    @Test
+    void testGetLastActivityMap_ReturnsCopyNotOriginal() {
+        String playerId = "player1";
+        gameState.updateLastActivity(playerId);
+
+        Map<String, Long> firstCopy = gameState.getLastActivityMap();
+        gameState.updateLastActivity("player2");
+        Map<String, Long> secondCopy = gameState.getLastActivityMap();
+
+        assertEquals(1, firstCopy.size());
+        assertEquals(2, secondCopy.size());
+    }
+
+
+    @Test
+    void testReplaceWithBot_MrX_RemovesGame() {
+        String playerName = "MrX";
+        GameManager mockGameManager = mock(GameManager.class);
+        gameState = new GameState("testGame", mock(SimpMessagingTemplate.class), mockGameManager);
+        gameState.addPlayer(playerName, mrX);
+
+        Player result = gameState.replaceWithBot(playerName);
+
+        assertNull(result);
+        verify(mockGameManager).removeGame("testGame");
+    }
+
+    @Test
+    void testReplaceWithBot_NonExistentPlayer() {
+        Player result = gameState.replaceWithBot("GhostPlayer");
+        assertNull(result);
+    }
 
 
 }
