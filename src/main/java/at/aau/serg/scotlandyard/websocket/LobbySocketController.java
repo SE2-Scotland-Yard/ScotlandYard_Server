@@ -49,7 +49,7 @@ public class LobbySocketController {
         messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId, LobbyMapper.toLobbyState(lobby));
 
         //Spielstart prüfen
-        if (lobby.allReady() && lobby.hasEnoughPlayers() && !lobby.isStarted()) {
+        if (lobby.allReady() && !lobby.isStarted()) {
             if (!lobby.hasExactlyOneMrX()) {
                 // Broadcast-Fehlermeldung an alle in der Lobby
                 messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId + "/error",
@@ -62,6 +62,18 @@ public class LobbySocketController {
 
                 // Aktualisierten Lobby-Zustand erneut senden
                 messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId, LobbyMapper.toLobbyState(lobby));
+                return;
+            }if(!lobby.hasEnoughPlayers()){
+
+                messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId + "/error",
+                        Map.of("error", "Zu wenig Spieler, bitte Bot hinzufügen"));
+
+                for (String player : lobby.getPlayers()) {
+                    lobby.markNotReady(player);
+                }
+
+                messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId, LobbyMapper.toLobbyState(lobby));
+
                 return;
             }
 
