@@ -360,11 +360,7 @@ public class GameState {
 
             if (gameManager != null) {
                 gameManager.removeGame(gameId);
-            } else {
-                logger.warn("⚠️ GameManager is null – vermutlich Testkontext.");
             }
-
-            System.out.println("MrX hat das Spiel verlassen – Game " + gameId + " wurde entfernt.");
             return null;
         }
 
