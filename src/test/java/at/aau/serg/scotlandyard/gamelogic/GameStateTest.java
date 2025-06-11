@@ -1,6 +1,6 @@
 package at.aau.serg.scotlandyard.gamelogic;
 
-import at.aau.serg.scotlandyard.gamelogic.board.Board;
+
 import at.aau.serg.scotlandyard.gamelogic.player.Detective;
 import at.aau.serg.scotlandyard.gamelogic.player.MrX;
 import at.aau.serg.scotlandyard.gamelogic.player.Player;
@@ -17,7 +17,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.mockito.AdditionalAnswers.returnsFirstArg;
+
 import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
@@ -111,7 +111,6 @@ class GameStateTest {
         verify(detective).move(eq(1), eq(Ticket.TAXI), any());
         assertTrue(result);
     }
-
 
     @Test
     void testMovePlayerDetectivePositionTaken() {
@@ -376,6 +375,27 @@ class GameStateTest {
         Player result = gameState.replaceWithBot("GhostPlayer");
         assertNull(result);
     }
+    @Test
+    void testMoveBlackTicket_Success() {
+
+        when(mrX.isValidMove(eq(42), eq(Ticket.BLACK), any())).thenReturn(true);
+        doNothing().when(mrX).moveBlack(eq(42), eq(Ticket.BLACK), any());
+
+
+        when(mrX.getTickets()).thenReturn(getDefaultTickets());
+
+
+        lenient().when(detective.getTickets()).thenReturn(getDefaultTickets());
+        lenient().when(detective.isValidMove(anyInt(), any(), any())).thenReturn(true);
+
+
+        boolean result = gameState.moveBlackTicket("MrX", 42, Ticket.BLACK);
+
+
+        assertTrue(result);
+        verify(mrX).moveBlack(eq(42), eq(Ticket.BLACK), any());
+    }
+
 
 
 }

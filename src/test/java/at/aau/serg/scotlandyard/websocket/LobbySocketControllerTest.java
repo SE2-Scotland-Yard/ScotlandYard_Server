@@ -4,6 +4,8 @@ import at.aau.serg.scotlandyard.dto.*;
 import at.aau.serg.scotlandyard.gamelogic.*;
 
 
+
+import at.aau.serg.scotlandyard.gamelogic.player.Player;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -14,6 +16,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.*;
 
 class LobbySocketControllerTest {
@@ -237,6 +240,122 @@ class LobbySocketControllerTest {
             verify(messaging).convertAndSend("/topic/lobby/game10", mockState);
         }
     }
+
+    @Test
+    void testHandleReady_StartsGameWhenAllReadyAndOneMrX() {
+        when(lobbyManager.getLobby("game11")).thenReturn(lobby);
+        when(lobby.allReady()).thenReturn(true);
+        when(lobby.hasEnoughPlayers()).thenReturn(true);
+        when(lobby.isStarted()).thenReturn(false);
+        when(lobby.hasExactlyOneMrX()).thenReturn(true);
+        when(lobby.getGameId()).thenReturn("game11");
+        when(lobby.getPlayers()).thenReturn(Set.of("MrX", "Det1"));
+
+        when(lobby.getSelectedRole("MrX")).thenReturn(Role.MRX);
+        when(lobby.getSelectedRole("Det1")).thenReturn(Role.DETECTIVE);
+
+        GameState game = mock(GameState.class);
+        when(gameManager.getOrCreateGame("game11")).thenReturn(game);
+        when(game.getCurrentPlayerName()).thenReturn("Det1");
+        when(game.getAllPlayers()).thenReturn(Map.of("MrX", mock(Player.class), "Det1", mock(Player.class)));
+
+        RoundManager roundManager = mock(RoundManager.class);
+        when(game.getRoundManager()).thenReturn(roundManager);
+        when(roundManager.getPlayerPositions()).thenReturn(Map.of("MrX", 50, "Det1", 60));
+
+        ReadyMessage msg = new ReadyMessage();
+        msg.setGameId("game11");
+        msg.setPlayerId("Det1");
+
+        try (MockedStatic<LobbyMapper> mockedLobby = mockStatic(LobbyMapper.class);
+             MockedStatic<GameMapper> mockedGame = mockStatic(GameMapper.class)) {
+
+            LobbyState lobbyState = mock(LobbyState.class);
+            mockedLobby.when(() -> LobbyMapper.toLobbyState(any())).thenReturn(lobbyState);
+
+            GameUpdate update = mock(GameUpdate.class);
+            mockedGame.when(() -> GameMapper.mapToGameUpdate(anyString(), anyMap(), anyString(), any(), any(), any()))
+                    .thenReturn(update);
+
+            controller.handleReady(msg);
+
+            verify(gameManager).getOrCreateGame("game11");
+            verify(game).initRoundManager(anyList(), any());
+            verify(messaging).convertAndSend("/topic/game/game11", update);
+            verify(messaging, atLeast(1)).convertAndSend("/topic/lobby/game11", lobbyState);
+        }
+    }
+
+    @Test
+    void testHandleAvatarSelection_AlreadyTakenAvatar_NoUpdate() {
+        when(lobbyManager.getLobby("game12")).thenReturn(lobby);
+        when(lobby.getSelectedRole("Eve")).thenReturn(Role.DETECTIVE);
+
+        Map<String, Integer> avatars = new HashMap<>();
+        avatars.put("Eve", 101);
+        avatars.put("Other", 102);
+
+        when(lobby.getAvatars()).thenReturn(avatars);
+
+        AvatarSelectionMessage msg = new AvatarSelectionMessage();
+        msg.setGameId("game12");
+        msg.setPlayerId("Eve");
+        msg.setAvatarResId(102); // Already taken
+
+        controller.handleAvatarSelection(msg);
+
+        verify(lobby, never()).selectAvatar(any(), anyInt());
+        verifyNoInteractions(messaging);
+    }
+    @Test
+    void testInitializeGame_MrXAndDetectiveSamePosition_ChangesMrXPosition() {
+        when(lobbyManager.getLobby("game42")).thenReturn(lobby);
+        when(lobby.getPlayers()).thenReturn(Set.of("MrX", "Det1"));
+        when(lobby.getSelectedRole("MrX")).thenReturn(Role.MRX);
+        when(lobby.getSelectedRole("Det1")).thenReturn(Role.DETECTIVE);
+        when(lobby.allReady()).thenReturn(true);
+        when(lobby.hasEnoughPlayers()).thenReturn(true);
+        when(lobby.isStarted()).thenReturn(false);
+        when(lobby.hasExactlyOneMrX()).thenReturn(true);
+        when(lobby.getGameId()).thenReturn("game42");
+
+
+        GameState gameState = new GameState("game42", messaging);
+        when(gameManager.getOrCreateGame("game42")).thenReturn(gameState);
+
+        ReadyMessage msg = new ReadyMessage();
+        msg.setGameId("game42");
+        msg.setPlayerId("Det1");
+
+        try (MockedStatic<LobbyMapper> mockedLobby = mockStatic(LobbyMapper.class);
+             MockedStatic<GameMapper> mockedGame = mockStatic(GameMapper.class)) {
+
+            LobbyState lobbyState = mock(LobbyState.class);
+            mockedLobby.when(() -> LobbyMapper.toLobbyState(any())).thenReturn(lobbyState);
+
+            GameUpdate update = mock(GameUpdate.class);
+            mockedGame.when(() -> GameMapper.mapToGameUpdate(any(), any(), any(), any(), any(), any()))
+                    .thenReturn(update);
+
+            controller.handleReady(msg);
+        }
+
+        // Nun kannst du aus dem echten GameState auslesen
+        Integer mrXPos = gameState.getAllPlayers().get("MrX").getPosition();
+        Integer detPos = gameState.getAllPlayers().get("Det1").getPosition();
+
+        assertNotEquals(mrXPos, detPos, "MrX sollte nicht auf derselben Position wie der Detective sein.");
+    }
+
+
+
+
+
+
+
+
+
+
 
 
 

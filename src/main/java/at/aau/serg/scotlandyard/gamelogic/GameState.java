@@ -24,6 +24,7 @@ import java.util.*;
 
 public class GameState {
     private final SimpMessagingTemplate messaging;
+    @Getter
     private final String gameId;
     @Getter
     private final Board board;
@@ -213,10 +214,6 @@ public class GameState {
         return roundManager.getCurrentPlayer().getName();
     }
 
-    public String getGameId() {
-        return  gameId;
-    }
-
 
     //Winning Condition
     public enum Winner{ MR_X, DETECTIVE, NONE}
@@ -355,7 +352,7 @@ public class GameState {
 
         // Wenn MrX geht, Spiel abbrechen (nicht durch Bot ersetzen)
         if (original instanceof MrX) {
-            messaging.convertAndSend("/topic/game/" + gameId + "/system", "mrX");
+            messaging.convertAndSend(TOPIC_GAME + gameId + "/system", "mrX");
 
             if (gameManager != null) {
                 gameManager.removeGame(gameId);
@@ -377,7 +374,7 @@ public class GameState {
             }
 
             messaging.convertAndSend(
-                    "/topic/game/" + gameId + "/system",
+                    TOPIC_GAME + gameId + "/system",
                     "🤖 Spieler '" + original.getName() + "' wurde durch den Bot '" + bot.getName() + "' ersetzt."
             );
 
@@ -399,7 +396,7 @@ public class GameState {
     }
 
     public boolean onlyBotsLeft() {
-        return players.values().stream().allMatch(P -> P instanceof BotPlayer);
+        return players.values().stream().allMatch(BotPlayer.class::isInstance);
     }
 
     public List <Map.Entry<Integer, Ticket>> getShortestMoveTo(String playername) {
