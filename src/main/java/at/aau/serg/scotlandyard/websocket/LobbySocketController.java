@@ -24,6 +24,8 @@ public class LobbySocketController {
     private final SimpMessagingTemplate messaging;
     private static final Logger logger = LoggerFactory.getLogger(LobbySocketController.class);
     private static final String TOPIC_LOBBY_LITERAL = "/topic/lobby/";
+    private static final String TOPIC_GAME_LITERAL = "/topic/game/";
+    private static final String BOT_PREFIX = "[BOT] ";
 
     public LobbySocketController(LobbyManager lobbyManager, GameManager gameManager, SimpMessagingTemplate messaging) {
         this.lobbyManager = lobbyManager;
@@ -47,7 +49,7 @@ public class LobbySocketController {
         messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId, LobbyMapper.toLobbyState(lobby));
 
         //Spielstart prüfen
-        if (lobby.allReady() && lobby.hasEnoughPlayers() && !lobby.isStarted()) {
+        if (lobby.allReady() && !lobby.isStarted()) {
             if (!lobby.hasExactlyOneMrX()) {
                 // Broadcast-Fehlermeldung an alle in der Lobby
                 messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId + "/error",
@@ -60,6 +62,18 @@ public class LobbySocketController {
 
                 // Aktualisierten Lobby-Zustand erneut senden
                 messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId, LobbyMapper.toLobbyState(lobby));
+                return;
+            }if(!lobby.hasEnoughPlayers()){
+
+                messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId + "/error",
+                        Map.of("error", "Zu wenig Spieler, bitte Bot hinzufügen"));
+
+                for (String player : lobby.getPlayers()) {
+                    lobby.markNotReady(player);
+                }
+
+                messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId, LobbyMapper.toLobbyState(lobby));
+
                 return;
             }
 
@@ -105,7 +119,7 @@ public class LobbySocketController {
             logger.info("Aktueller Spieler im Mapper: {}", game.getCurrentPlayerName());
 
             messaging.convertAndSend(
-                    "/topic/game/" + gameId,
+                    TOPIC_GAME_LITERAL + gameId,
                     GameMapper.mapToGameUpdate(
                             gameId,
                             game.getRoundManager().getPlayerPositions(),
@@ -167,7 +181,7 @@ public class LobbySocketController {
 
             if (!isTaken) {
                 lobby.selectAvatar(playerId, desiredAvatar);
-                messaging.convertAndSend("/topic/lobby/" + msg.getGameId(), LobbyMapper.toLobbyState(lobby));
+                messaging.convertAndSend(TOPIC_LOBBY_LITERAL + msg.getGameId(), LobbyMapper.toLobbyState(lobby));
             }
         }
     }
@@ -191,7 +205,7 @@ public class LobbySocketController {
         Lobby lobby = lobbyManager.getLobby(gameId);
         if (lobby != null) {
             lobbyManager.leaveLobby(gameId, playerId);
-            messaging.convertAndSend("/topic/lobby/" + gameId, LobbyMapper.toLobbyState(lobby));
+            messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId, LobbyMapper.toLobbyState(lobby));
         }
     }
 
@@ -217,7 +231,7 @@ public class LobbySocketController {
         int botIndex = 1;
         String botName;
         do {
-            botName = "[BOT] " + botIndex++;
+            botName = BOT_PREFIX + botIndex++;
         } while (lobby.getPlayers().contains(botName));
 
         // Bot zur Lobby hinzufügen
@@ -225,7 +239,7 @@ public class LobbySocketController {
         lobby.selectRole(botName, Role.DETECTIVE);
         lobby.markReady(botName);
 
-        messaging.convertAndSend("/topic/lobby/" + gameId, LobbyMapper.toLobbyState(lobby));
+        messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId, LobbyMapper.toLobbyState(lobby));
         logger.info(" Bot '{}' zur Lobby {} hinzugefügt", botName, gameId);
     }
 
@@ -239,8 +253,8 @@ public class LobbySocketController {
         String botToRemove = lobby.getPlayers().stream()
                 .filter(name -> name.startsWith("[BOT] "))
                 .sorted((a, b) -> {
-                    int numA = Integer.parseInt(a.replace("[BOT] ", ""));
-                    int numB = Integer.parseInt(b.replace("[BOT] ", ""));
+                    int numA = Integer.parseInt(a.replace(BOT_PREFIX, ""));
+                    int numB = Integer.parseInt(b.replace(BOT_PREFIX, ""));
                     return Integer.compare(numB, numA); // absteigend
                 })
                 .findFirst()
@@ -248,7 +262,7 @@ public class LobbySocketController {
 
         if (botToRemove != null) {
             lobby.removePlayer(botToRemove);
-            messaging.convertAndSend("/topic/lobby/" + gameId, LobbyMapper.toLobbyState(lobby));
+            messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId, LobbyMapper.toLobbyState(lobby));
             logger.info("Bot '{}' aus Lobby {} entfernt", botToRemove, gameId);
         }
     }

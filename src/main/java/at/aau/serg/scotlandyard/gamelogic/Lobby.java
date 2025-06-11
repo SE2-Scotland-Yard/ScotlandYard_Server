@@ -17,7 +17,7 @@ public class Lobby {
     @Getter
     private final Map<String, Boolean> readyStatus = new HashMap<>();
     private final Map<String, Role> selectedRoles = new HashMap<>();
-    private static final int MINPLAYERS = 1;
+    private static final int MINPLAYERS = 3;
     private static final int MAXPLAYERS = 6;
     private final boolean isPublic;
     @Getter

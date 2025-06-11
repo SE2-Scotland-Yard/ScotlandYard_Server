@@ -21,8 +21,19 @@ class LobbyStateTest {
 
     @BeforeEach
     void setUp() {
-        lobbyState = new LobbyState(gameId, players, readyStatus, selectedRoles, isPublic, isStarted, maxPlayers,avatars);
+        lobbyState = LobbyState.builder()
+                .gameId(gameId)
+                .players(players)
+                .readyStatus(readyStatus)
+                .selectedRoles(selectedRoles)
+                .isPublic(isPublic)
+                .isStarted(isStarted)
+                .maxPlayers(maxPlayers)
+                .currentPlayerCount(players.size()) // oder manuell setzen
+                .avatars(avatars)
+                .build();
     }
+
 
     // --- Game ID ---
     @Test

@@ -144,6 +144,8 @@ class LobbyTest {
     @Test
     void testHasEnoughPlayers(){
         lobby.addPlayer("Player1");
+        lobby.addPlayer("Player2");
+        lobby.addPlayer("Player3");
         assertTrue(lobby.hasEnoughPlayers());
     }
 
