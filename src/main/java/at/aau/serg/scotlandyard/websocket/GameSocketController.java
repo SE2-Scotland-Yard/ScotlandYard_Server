@@ -14,7 +14,6 @@ public class GameSocketController {
 
     private final GameManager gameManager;
     private final SimpMessagingTemplate messaging;
-    private static final String TOPIC_GAME_LITERAL = "/topic/game/";
 
     public GameSocketController(GameManager gameManager, SimpMessagingTemplate messaging) {
         this.gameManager = gameManager;
