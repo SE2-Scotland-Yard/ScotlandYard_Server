@@ -27,7 +27,12 @@ class RoundManagerTest {
     private MrX mrX;
     @Mock
     private GameState gameState;
-
+    @Mock
+    private Detective newDetective;
+    @Mock
+    private MrX newMrX;
+    @Mock
+    private Player botDetective;
 
     private RoundManager roundManager;
 
@@ -39,12 +44,15 @@ class RoundManagerTest {
         when(detective2.getName()).thenReturn("Detective2");
         when(mrX.getName()).thenReturn("MrX");
 
-        //Setup positions
+        when(newDetective.getName()).thenReturn("NewDetective");
+        when(newMrX.getName()).thenReturn("NewMrX");
+
+        when(botDetective.getName()).thenReturn("[BOT]BotDetective");
+
         when(detective1.getPosition()).thenReturn(4);
         when(detective2.getPosition()).thenReturn(0);
         when(mrX.getPosition()).thenReturn(5);
 
-        //Setup Roundmanager
         ArrayList<Detective> detectives = new ArrayList<>();
         detectives.add(detective1);
         detectives.add(detective2);
@@ -141,7 +149,7 @@ class RoundManagerTest {
     void testIsGameOverMaxRounds(){
         assertFalse(roundManager.isGameOver());
 
-        int totalTurns = 3 * 25; // MaxRounds = 24 (smaller than 25), 3 total Players
+        int totalTurns = 3 * 25;
 
         for (int i = 0; i < totalTurns; i++) {
             roundManager.nextTurn();
@@ -154,6 +162,19 @@ class RoundManagerTest {
     void testGetters() {
         assertEquals(2, roundManager.getDetectives().size());
         assertEquals(mrX, roundManager.getMrX());
+        assertEquals(3, roundManager.getTurnOrder().size());
+    }
+
+    @Test
+    void testReplaceNonExistentPlayer() {
+        Detective dummyDetective = mock(Detective.class);
+        when(dummyDetective.getName()).thenReturn("Dummy");
+
+        roundManager.replacePlayer(dummyDetective, newDetective);
+
+        assertFalse(roundManager.getDetectives().contains(newDetective));
+        assertFalse(roundManager.getTurnOrder().contains(newDetective));
+        assertEquals(2, roundManager.getDetectives().size());
         assertEquals(3, roundManager.getTurnOrder().size());
     }
 
