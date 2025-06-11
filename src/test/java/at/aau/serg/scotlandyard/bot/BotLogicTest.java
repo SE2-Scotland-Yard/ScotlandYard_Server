@@ -1,73 +1,66 @@
 package at.aau.serg.scotlandyard.bot;
 
+
 import at.aau.serg.scotlandyard.gamelogic.GameState;
 import at.aau.serg.scotlandyard.gamelogic.player.Player;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.Ticket;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-
-import java.util.List;
-import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.*;
+import java.util.*;
 import static org.mockito.Mockito.*;
 
 class BotLogicTest {
 
-    private GameState gameState;
-    private Player bot;
+    @Test
+    void decideMove_shouldReturnShortestMove() {
+        String playerName = "Detective1";
+        GameState gameState = mock(GameState.class);
 
-    @BeforeEach
-    void setUp() {
-        gameState = mock(GameState.class);
-        bot = mock(Player.class);
+        Map.Entry<Integer, Ticket> expectedMove = Map.entry(2, Ticket.TAXI);
+        when(gameState.getShortestMoveTo(playerName)).thenReturn(Collections.singletonList(expectedMove));
 
-        when(bot.getName()).thenReturn("Bot1");
-        when(gameState.getGameId()).thenReturn("game-123");
+        Map.Entry<Integer, Ticket> result = BotLogic.decideMove(playerName, gameState);
+
+        assertEquals(expectedMove, result);
     }
 
     @Test
-    void testDecideMoveReturnsFirstAllowedMove() {
-        List<Map.Entry<Integer, Ticket>> moves = List.of(
-                Map.entry(42, Ticket.TAXI),
-                Map.entry(43, Ticket.BUS)
-        );
-        when(gameState.getAllowedMoves("Bot1")).thenReturn(moves);
+    void decideMove_shouldReturnNullWhenNoMovesAvailable() {
+        String playerName = "Detective1";
+        GameState gameState = mock(GameState.class);
+        when(gameState.getShortestMoveTo(playerName)).thenReturn(Collections.emptyList());
 
-        var move = BotLogic.decideMove("Bot1", gameState);
+        Map.Entry<Integer, Ticket> result = BotLogic.decideMove(playerName, gameState);
 
-        assertNotNull(move);
-        assertEquals(42, move.getKey());
-        assertEquals(Ticket.TAXI, move.getValue());
+        assertNull(result);
     }
 
     @Test
-    void testDecideMoveReturnsNullIfNoMoves() {
-        when(gameState.getAllowedMoves("Bot1")).thenReturn(List.of());
+    void executeBotMove_shouldMovePlayerWhenValidMoveExists() {
+        Player bot = mock(Player.class);
+        when(bot.getName()).thenReturn("Detective1");
 
-        var move = BotLogic.decideMove("Bot1", gameState);
-
-        assertNull(move);
-    }
-
-    @Test
-    void testExecuteBotMoveCallsMovePlayer() {
-        when(gameState.getAllowedMoves("Bot1")).thenReturn(
-                List.of(Map.entry(50, Ticket.BUS))
-        );
+        GameState gameState = mock(GameState.class);
+        Map.Entry<Integer, Ticket> move = Map.entry(5, Ticket.BUS);
+        when(gameState.getShortestMoveTo("Detective1")).thenReturn(Collections.singletonList(move));
 
         BotLogic.executeBotMove(bot, gameState);
 
-        verify(gameState).movePlayer("Bot1", 50, Ticket.BUS);
+        verify(gameState).movePlayer("Detective1", 5, Ticket.BUS);
     }
 
     @Test
-    void testExecuteBotMoveCallsCantMoveIfNoMoves() {
-        when(gameState.getAllowedMoves("Bot1")).thenReturn(List.of());
+    void executeBotMove_shouldCallCantMoveWhenNoValidMoves() {
+        Player bot = mock(Player.class);
+        when(bot.getName()).thenReturn("Detective1");
+
+        GameState gameState = mock(GameState.class);
+        when(gameState.getShortestMoveTo("Detective1")).thenReturn(Collections.emptyList());
+        when(gameState.getGameId()).thenReturn("123");
 
         BotLogic.executeBotMove(bot, gameState);
 
-        verify(gameState).cantMove("game-123");
+        verify(gameState).cantMove("123");
+        verify(gameState, never()).movePlayer(any(), anyInt(), any());
     }
 }
