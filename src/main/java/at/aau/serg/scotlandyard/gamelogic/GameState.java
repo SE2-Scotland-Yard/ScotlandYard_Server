@@ -293,7 +293,6 @@ public class GameState {
         }
         List<Map.Entry<Integer, String>> result = new ArrayList<>();
         int currentPos = p.getPosition();
-
         List<Edge> firstMoves = board.getConnectionsFrom(currentPos)
                 .stream()
                 .filter(edge -> p.getTickets().hasTicket(edge.getTicket()))
@@ -410,6 +409,78 @@ public class GameState {
 
     public boolean onlyBotsLeft() {
         return players.values().stream().allMatch(P -> P instanceof BotPlayer);
+    }
+
+    public List <Map.Entry<Integer, Ticket>> getShortestMoveTo(String playername) {
+        if (playername == null) {
+            return null;
+        }
+
+        Player player = players.get(playername);
+        if (player == null) {
+            return null;
+        }
+        int to = getMrXPosition();
+        int from = player.getPosition();
+
+        Map<Integer, Integer> distances = new HashMap<>();
+        Map<Integer, Map.Entry<Integer, Ticket>> predecessors = new HashMap<>();
+        PriorityQueue<Integer> queue = new PriorityQueue<>(Comparator.comparingInt(distances::get));
+
+        distances.put(from, 0);
+        queue.add(from);
+
+        while (!queue.isEmpty()) {
+            int current = queue.poll();
+
+            if (current == to) {
+                break;
+            }
+
+            for (Edge edge : board.getConnectionsFrom(current)) {
+                if (!player.getTickets().hasTicket(edge.getTicket())) {
+                    continue;
+                }
+
+                if (player instanceof Detective && isPositionOccupied(edge.getTo())) {
+                    continue;
+                }
+
+                int newDist = distances.getOrDefault(current, Integer.MAX_VALUE) + 1;
+
+                if (newDist < distances.getOrDefault(edge.getTo(), Integer.MAX_VALUE)) {
+                    distances.put(edge.getTo(), newDist);
+                    predecessors.put(edge.getTo(), Map.entry(current, edge.getTicket()));
+                    queue.remove(edge.getTo());
+                    queue.add(edge.getTo());
+                }
+            }
+        }
+
+        if (!distances.containsKey(to)) {
+            return null;
+        }
+
+        if (from == to) {
+            return null;
+        }
+
+        int current = to;
+        while (predecessors.get(current).getKey() != from) {
+            current = predecessors.get(current).getKey();
+        }
+
+        Map.Entry<Integer, Ticket> nextMove = Map.entry(current, predecessors.get(current).getValue());
+
+        return Collections.singletonList(nextMove);
+    }
+    public Integer getMrXPosition() {
+        for (Player p : players.values()) {
+            if (p instanceof MrX) {
+                return p.getPosition();
+            }
+        }
+        return null;
     }
 
 }
