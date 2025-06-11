@@ -35,11 +35,4 @@ public class GameManager {
         return games.keySet();
     }
 
-    public void updateLastActivity(String gameId, String playerId) {
-        GameState game = games.get(gameId);
-        if (game != null) {
-            game.updateLastActivity(playerId);
-        }
-    }
-
 }
