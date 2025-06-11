@@ -48,21 +48,6 @@ public class GameInactivityMonitor {
 
                 Player bot = game.replaceWithBot(player);
 
-                if (bot == null) {
-                    continue;
-                }
-
-
-
-                if (game.getCurrentPlayerName().equals(bot.getName())) {
-                    var move = BotLogic.decideMove(bot.getName(), game);
-                    if (move != null) {
-                        game.movePlayer(bot.getName(), move.getKey(), move.getValue());
-                    } else {
-                        game.cantMove(gameId);
-                    }
-                }
-
             }
 
         }
