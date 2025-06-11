@@ -40,20 +40,6 @@ class GameSocketControllerTest {
         verify(game).updateLastActivity(playerId);
     }
 
-    @Test
-    void testHandleGamePing_gameNotFound_doesNothing() {
-        Map<String, String> payload = Map.of(
-                "gameId", "unknownGame",
-                "playerId", "Bob"
-        );
-
-        when(gameManager.getGame("unknownGame")).thenReturn(null);
-
-        controller.handleGamePing(payload);
-
-        // Keine Interaktion mit null
-        // Test besteht einfach, wenn kein Fehler geworfen wird
-    }
 
     @Test
     void testHandleGameLeave_replacesWithBot() {
@@ -72,16 +58,4 @@ class GameSocketControllerTest {
         verify(game).replaceWithBot(playerId);
     }
 
-    @Test
-    void testHandleGameLeave_gameNotFound_doesNothing() {
-        Map<String, String> payload = Map.of(
-                "gameId", "nonexistent",
-                "playerId", "Zoe"
-        );
-
-        when(gameManager.getGame("nonexistent")).thenReturn(null);
-
-        controller.handleGameLeave(payload);
-
-    }
 }

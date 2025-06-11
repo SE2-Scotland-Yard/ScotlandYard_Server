@@ -43,7 +43,7 @@ class LobbyInactivityMonitorTest {
         Lobby lobby = mock(Lobby.class);
         when(lobby.getGameId()).thenReturn("game2");
 
-        // simulate initial players
+
         when(lobby.getPlayers()).thenReturn(Set.of("Charlie")); // 1. Aufruf
         when(lobby.getLastActivity("Charlie")).thenReturn(System.currentTimeMillis() - (5 * 60 * 1000));
 
