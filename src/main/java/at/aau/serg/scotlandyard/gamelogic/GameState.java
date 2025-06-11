@@ -17,7 +17,6 @@ import at.aau.serg.scotlandyard.bot.BotLogic;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.*;
@@ -38,7 +37,7 @@ public class GameState {
 
     Map<String, Integer> playerPositions = new HashMap<>();
     private final Map<String, Long> lastActivityMap = new HashMap<>();
-    @Autowired
+
     private GameManager gameManager;
 
     public GameState(String gameId, SimpMessagingTemplate messaging) {
@@ -368,7 +367,7 @@ public class GameState {
 
         // Bot erzeugen und Spieler ersetzen
         Player bot = BotFactory.createBotReplacement(original);
-        if (bot != null) {
+
             players.remove(original.getName());
             playerPositions.remove(original.getName());
             players.put(bot.getName(), bot);
@@ -395,10 +394,6 @@ public class GameState {
             if (onlyBotsLeft()) {
                 gameManager.removeGame(gameId);
             }
-
-
-            return bot;
-        }
 
         return null;
     }
