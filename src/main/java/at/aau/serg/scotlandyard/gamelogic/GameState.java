@@ -95,7 +95,7 @@ public class GameState {
     }
 
     public Integer getMrXPosition(String name) {
-        int position=0;
+        int position;
         Player p = players.get(name);
         if (p == null) {
             return 0;
@@ -399,12 +399,12 @@ public class GameState {
         return players.values().stream().allMatch(BotPlayer.class::isInstance);
     }
 
-    public List <Map.Entry<Integer, Ticket>> getShortestMoveTo(String playername) {
-        if (playername == null) {
+    public List <Map.Entry<Integer, Ticket>> getShortestMoveTo(String playerName) {
+        if (playerName == null) {
             return null;
         }
 
-        Player player = players.get(playername);
+        Player player = players.get(playerName);
         if (player == null) {
             return null;
         }
@@ -446,11 +446,11 @@ public class GameState {
         }
 
         if (!distances.containsKey(to)) {
-            return null;
+            return new ArrayList<>();
         }
 
         if (from == to) {
-            return null;
+            return new ArrayList<>();
         }
 
         int current = to;
