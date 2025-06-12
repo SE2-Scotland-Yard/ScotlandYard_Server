@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 public class BotLogic {
-
     // Privater Konstruktor verhindert Instanziierung
     private BotLogic() {
         throw new UnsupportedOperationException("Utility class");
