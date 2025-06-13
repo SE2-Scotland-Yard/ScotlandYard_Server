@@ -3,8 +3,9 @@ package at.aau.serg.scotlandyard.websocket;
 import at.aau.serg.scotlandyard.bot.BotLogic;
 import at.aau.serg.scotlandyard.gamelogic.GameManager;
 import at.aau.serg.scotlandyard.gamelogic.GameState;
-import at.aau.serg.scotlandyard.bot.BotPlayer;
 import at.aau.serg.scotlandyard.gamelogic.player.Player;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ public class GameInactivityMonitor {
 
     private final GameManager gameManager;
     private final SimpMessagingTemplate messaging;
+    private static final Logger logger = LoggerFactory.getLogger(GameInactivityMonitor.class);
 
     public GameInactivityMonitor(GameManager gameManager, SimpMessagingTemplate messaging) {
         this.gameManager = gameManager;
@@ -44,7 +46,7 @@ public class GameInactivityMonitor {
             }
 
             for (String player : inactivePlayers) {
-                System.out.println("Spieler im Spiel inaktiv: " + player + " in Game " + gameId);
+                logger.info("Spieler im Spiel inaktiv: {} in Game {}",player, gameId);
 
                 Player bot = game.replaceWithBot(player);
 

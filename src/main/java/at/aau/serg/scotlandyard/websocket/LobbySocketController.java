@@ -63,7 +63,8 @@ public class LobbySocketController {
                 // Aktualisierten Lobby-Zustand erneut senden
                 messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId, LobbyMapper.toLobbyState(lobby));
                 return;
-            }if(!lobby.hasEnoughPlayers()){
+            }
+            if(!lobby.hasEnoughPlayers()){
 
                 messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId + "/error",
                         Map.of("error", "Zu wenig Spieler, bitte Bot hinzufügen"));
@@ -82,9 +83,9 @@ public class LobbySocketController {
             messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId, LobbyMapper.toLobbyState(lobby)); // Lobby-Update
 
             GameState game = initializeGame(gameId, lobby);
-            if(game != null){
-                logger.info(game.toString());
-            }
+
+            logger.info("Game: {}",game.toString());
+
 
         }
     }
@@ -200,7 +201,7 @@ public class LobbySocketController {
     public void handleLeave(@Payload LeaveRequest request) {
         String gameId = request.getGameId();
         String playerId = request.getPlayerId();
-        System.out.println("Game leave received: " + gameId + ", " + playerId);
+        logger.info("Game leave received: {}, {}" , gameId,playerId);
 
         Lobby lobby = lobbyManager.getLobby(gameId);
         if (lobby != null) {
@@ -213,7 +214,7 @@ public class LobbySocketController {
     public void handlePing(Map<String, String> payload) {
         String gameId = payload.get("gameId");
         String playerId = payload.get("playerId");
-
+        playerId = playerId.replaceAll("[\n\r]", "_");
         Lobby lobby = lobbyManager.getLobby(gameId);
         if (lobby != null) {
             lobby.updateLastActivity(playerId);
