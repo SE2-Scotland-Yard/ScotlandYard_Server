@@ -84,9 +84,6 @@ public class LobbySocketController {
 
             GameState game = initializeGame(gameId, lobby);
 
-            logger.info("Game: {}",game.toString());
-
-
         }
     }
 
@@ -252,7 +249,7 @@ public class LobbySocketController {
 
         // Finde den zuletzt hinzugefügten Bot (höchste Nummer)
         String botToRemove = lobby.getPlayers().stream()
-                .filter(name -> name.startsWith("[BOT] "))
+                .filter(name -> name.startsWith(BOT_PREFIX))
                 .sorted((a, b) -> {
                     int numA = Integer.parseInt(a.replace(BOT_PREFIX, ""));
                     int numB = Integer.parseInt(b.replace(BOT_PREFIX, ""));
