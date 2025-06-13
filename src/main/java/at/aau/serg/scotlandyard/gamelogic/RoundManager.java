@@ -33,7 +33,7 @@ public class RoundManager {
     private static final int MAXROUNDS = 24;
 
     private final List<Integer> revealRounds = Arrays.asList(3,8,13,18,24); //for Mr.X
-    private static final Logger logger = LoggerFactory.getLogger(GameState.class);
+    private static final Logger logger = LoggerFactory.getLogger(RoundManager.class);
     @Setter
     private Player lastPlayerMoved;
     private boolean mrXwinByNoMoves = false;

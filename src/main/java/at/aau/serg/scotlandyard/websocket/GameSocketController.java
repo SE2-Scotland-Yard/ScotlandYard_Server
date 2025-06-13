@@ -4,6 +4,8 @@ package at.aau.serg.scotlandyard.websocket;
 
 import at.aau.serg.scotlandyard.gamelogic.GameManager;
 import at.aau.serg.scotlandyard.gamelogic.GameState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -14,6 +16,7 @@ public class GameSocketController {
 
     private final GameManager gameManager;
     private final SimpMessagingTemplate messaging;
+    private static final Logger logger = LoggerFactory.getLogger(GameSocketController.class);
 
     public GameSocketController(GameManager gameManager, SimpMessagingTemplate messaging) {
         this.gameManager = gameManager;
@@ -28,7 +31,7 @@ public class GameSocketController {
         GameState game = gameManager.getGame(gameId);
         if (game != null) {
             game.updateLastActivity(playerId);
-            System.out.println("→ [GAME]]Ping erhalten im Spiel von " + playerId);
+            logger.info("→ [GAME]]Ping erhalten im Spiel von {}",playerId);
         }
     }
 
@@ -37,12 +40,12 @@ public class GameSocketController {
         String gameId = payload.get("gameId");
         String playerId = payload.get("playerId");
 
-        System.out.println("Game leave received: " + gameId + ", " + playerId);
+        logger.info("Game leave received: {} {}",gameId,playerId);
 
         GameState game = gameManager.getGame(gameId);
         if (game != null) {
             game.replaceWithBot(playerId);
-            System.out.println("Spieler ersetzt durch Bot: " + playerId);
+            logger.info("Spieler ersetzt durch Bot: {}",playerId);
         }
     }
 

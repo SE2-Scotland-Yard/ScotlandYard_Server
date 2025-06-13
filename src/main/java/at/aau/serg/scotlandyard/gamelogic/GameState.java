@@ -401,12 +401,12 @@ public class GameState {
 
     public List <Map.Entry<Integer, Ticket>> getShortestMoveTo(String playerName) {
         if (playerName == null) {
-            return null;
+            return new ArrayList<>();
         }
 
         Player player = players.get(playerName);
         if (player == null) {
-            return null;
+            return new ArrayList<>();
         }
         int to = getMrXPosition();
         int from = player.getPosition();
@@ -426,11 +426,7 @@ public class GameState {
             }
 
             for (Edge edge : board.getConnectionsFrom(current)) {
-                if (!player.getTickets().hasTicket(edge.getTicket())) {
-                    continue;
-                }
-
-                if (player instanceof Detective && isPositionOccupied(edge.getTo())) {
+                if ((!player.getTickets().hasTicket(edge.getTicket()))||(player instanceof Detective && isPositionOccupied(edge.getTo()))) {
                     continue;
                 }
 

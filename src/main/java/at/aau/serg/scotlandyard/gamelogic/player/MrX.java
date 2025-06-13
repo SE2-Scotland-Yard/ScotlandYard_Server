@@ -45,6 +45,8 @@ public class MrX extends Player {
             case UNDERGROUND:
                 tickets.addTicket(Ticket.UNDERGROUND);
                 break;
+            default:
+                break;
         }
     }
 
