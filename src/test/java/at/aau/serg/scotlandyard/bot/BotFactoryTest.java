@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class BotFactoryTest {
 
     private Detective detective;
-    private MrX Mrx;
+    private MrX mrx;
 
     @BeforeEach
     void setUp() {
@@ -27,7 +27,7 @@ class BotFactoryTest {
 
         PlayerTickets tickets = new PlayerTickets(ticketMap);
         detective = new Detective("Bot1", 42, tickets);
-        Mrx = new MrX("Bot2", 55, tickets);
+        mrx = new MrX("Bot2", 55, tickets);
     }
 
     @Test
@@ -43,12 +43,12 @@ class BotFactoryTest {
 
     @Test
     void testCreateBotDetectiveReturnsMrXInstance() {
-        Player bot2 = BotFactory.createBotReplacement(Mrx);
+        Player bot2 = BotFactory.createBotReplacement(mrx);
 
         assertNotNull(bot2);
         assertInstanceOf(MrX.class, bot2);
         assertEquals("[BOT] Bot2", bot2.getName());
-        assertEquals(Mrx.getPosition(), bot2.getPosition());
+        assertEquals(mrx.getPosition(), bot2.getPosition());
 
     }
 }

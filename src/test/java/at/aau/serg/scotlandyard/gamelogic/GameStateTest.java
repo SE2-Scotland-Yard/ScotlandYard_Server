@@ -15,6 +15,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import java.lang.reflect.Field;
 import java.util.*;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -336,7 +339,11 @@ class GameStateTest {
         gameState.updateLastActivity(playerId);
         long firstTimestamp = gameState.getLastActivityMap().get(playerId);
 
-        Thread.sleep(10);
+        await().atMost(10, SECONDS) // Timeout nach 100ms
+                .until(() -> {
+                    gameState.updateLastActivity(playerId);
+                    return gameState.getLastActivityMap().get(playerId) > firstTimestamp;
+                });
         gameState.updateLastActivity(playerId);
         long secondTimestamp = gameState.getLastActivityMap().get(playerId);
 

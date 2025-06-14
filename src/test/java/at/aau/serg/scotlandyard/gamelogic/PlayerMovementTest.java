@@ -123,21 +123,6 @@ class PlayerMovementTest {
         assertEquals(2, game.getMrXMoveHistory().size(), "Die MrX-Zughistorie sollte zwei Einträge enthalten.");
     }
 
-    private void moveMrXToRound(GameState game, MrX mrX, int targetRound) {
-        Detective dummy = new Detective("D");
-        game.addPlayer(mrX.getName(), mrX);
-        game.addPlayer(dummy.getName(), dummy);
-        game.initRoundManager(List.of(dummy), mrX);
-
-        int currentPos = mrX.getPosition();
-
-        for (int i = 1; i <= targetRound; i++) {
-            Edge edge = board.getConnectionsFrom(currentPos).get(0);
-            game.movePlayer(mrX.getName(), edge.getTo(), edge.getTicket());
-            currentPos = edge.getTo();
-        }
-    }
-
     @Test
     void moveBlackTest_ValidMove(){
         MrX mrX = new MrX("MrX");
