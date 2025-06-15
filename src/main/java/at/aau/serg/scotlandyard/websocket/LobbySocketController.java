@@ -103,9 +103,10 @@ public class LobbySocketController {
                 detectives.add((Detective) player);
             }
         }
+        Random random = new Random();
         for(Detective detective : detectives) {
             if(mrX.getPosition()==detective.getPosition()){
-                mrX.setPos(new Random().nextInt(199)+1);
+                mrX.setPos(random.nextInt(199)+1);
             }
         }
 
@@ -198,7 +199,9 @@ public class LobbySocketController {
     public void handleLeave(@Payload LeaveRequest request) {
         String gameId = request.getGameId();
         String playerId = request.getPlayerId();
-        logger.info("Game leave received: {}, {}" , gameId,playerId);
+        String safeGameId = gameId != null ? gameId.replaceAll("[\n\r\t]", "_") : "null";
+        String safePlayerId = playerId != null ? playerId.replaceAll("[\n\r\t]", "_") : "null";
+        logger.info("Game leave received: {}, {}" , safeGameId,safePlayerId);
 
         Lobby lobby = lobbyManager.getLobby(gameId);
         if (lobby != null) {
@@ -238,7 +241,9 @@ public class LobbySocketController {
         lobby.markReady(botName);
 
         messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId, LobbyMapper.toLobbyState(lobby));
-        logger.info(" Bot '{}' zur Lobby {} hinzugefügt", botName, gameId);
+
+        String safeGameId = gameId != null ? gameId.replaceAll("[\n\r\t]", "_") : "null";
+        logger.info(" Bot '{}' zur Lobby {} hinzugefügt", botName, safeGameId);
     }
 
     @MessageMapping("/lobby/remove-bot")
@@ -261,7 +266,8 @@ public class LobbySocketController {
         if (botToRemove != null) {
             lobby.removePlayer(botToRemove);
             messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId, LobbyMapper.toLobbyState(lobby));
-            logger.info("Bot '{}' aus Lobby {} entfernt", botToRemove, gameId);
+            String safeGameId = gameId != null ? gameId.replaceAll("[\n\r\t]", "_") : "null";
+            logger.info("Bot '{}' aus Lobby {} entfernt", botToRemove, safeGameId);
         }
     }
 

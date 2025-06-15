@@ -31,7 +31,8 @@ public class GameSocketController {
         GameState game = gameManager.getGame(gameId);
         if (game != null) {
             game.updateLastActivity(playerId);
-            logger.info("→ [GAME]]Ping erhalten im Spiel von {}",playerId);
+            String safePlayerId = playerId.replaceAll("[\n\r\t]", "_");
+            logger.info("→ [GAME]]Ping erhalten im Spiel von {}", safePlayerId);
         }
     }
 
@@ -40,12 +41,15 @@ public class GameSocketController {
         String gameId = payload.get("gameId");
         String playerId = payload.get("playerId");
 
-        logger.info("Game leave received: {} {}",gameId,playerId);
+        String safeGameId = gameId != null ? gameId.replaceAll("[\n\r\t]", "_") : "null";
+        String safePlayerId = playerId != null ? playerId.replaceAll("[\n\r\t]", "_") : "null";
+
+        logger.info("Game leave received: {} {}",safeGameId,safePlayerId);
 
         GameState game = gameManager.getGame(gameId);
         if (game != null) {
             game.replaceWithBot(playerId);
-            logger.info("Spieler ersetzt durch Bot: {}",playerId);
+            logger.info("Spieler ersetzt durch Bot: {}",safePlayerId);
         }
     }
 

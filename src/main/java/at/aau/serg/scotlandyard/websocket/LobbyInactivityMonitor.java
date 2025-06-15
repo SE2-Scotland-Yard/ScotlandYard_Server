@@ -27,7 +27,7 @@ public class LobbyInactivityMonitor {
     @Scheduled(fixedRate = 60_000) // alle 60 Sekunden
     public void checkInactivePlayers() {
         long now = System.currentTimeMillis();
-        long timeoutMillis = 4 * 60 * 1000;
+        long timeoutMillis = 4L * 60L * 1000L;
 
 
         List<String> lobbiesToRemove = new ArrayList<>();
