@@ -279,4 +279,61 @@ class GameControllerTest {
 
         assertEquals("Spiel läuft noch.", result);
     }
+
+    @Test
+    void blackTicket_WhenInvalidTicket_ReturnsInvalidTicketMessage() {
+        // Kein Mocking nötig, da WertOf scheitert
+        Map<String, String> response = gameController.blackTicket(gameId, playerName, position, "NOT_A_TICKET");
+        assertEquals("Ungültiges Ticket: NOT_A_TICKET", response.get("message"));
+    }
+
+    @Test
+    void blackTicket_WhenGameNotFound_ReturnsGameNotFoundMessage() {
+        when(gameManager.getGame(gameId)).thenReturn(null);
+        Map<String, String> response = gameController.blackTicket(gameId, playerName, position, "TAXI");
+        assertEquals("Spiel nicht gefunden!", response.get("message"));
+    }
+
+    @Test
+    void blackTicket_WhenPlayerNotInGame_ReturnsPlayerNotFoundMessage() {
+        when(gameManager.getGame(gameId)).thenReturn(gameState);
+        when(gameState.getAllPlayers()).thenReturn(Collections.emptyMap());
+        Map<String, String> response = gameController.blackTicket(gameId, playerName, position, "TAXI");
+        assertEquals("Spieler " + playerName + " existiert nicht!", response.get("message"));
+    }
+
+    @Test
+    void blackTicket_WhenMoveInvalid_ReturnsInvalidMoveMessage() {
+        when(gameManager.getGame(gameId)).thenReturn(gameState);
+        when(gameState.getAllPlayers()).thenReturn(Map.of(playerName, player));
+        when(gameState.moveBlackTicket(playerName, position, Ticket.TAXI)).thenReturn(false);
+
+        Map<String, String> response = gameController.blackTicket(gameId, playerName, position, "TAXI");
+        assertEquals("Ungültiger Zug!", response.get("message"));
+    }
+
+    @Test
+    void blackTicket_WhenMoveWinsGame_ReturnsWinnerMessage() {
+        when(gameManager.getGame(gameId)).thenReturn(gameState);
+        when(gameState.getAllPlayers()).thenReturn(Map.of(playerName, player));
+        when(gameState.moveBlackTicket(playerName, position, Ticket.TAXI)).thenReturn(true);
+        when(gameState.getWinner()).thenReturn(GameState.Winner.MR_X);
+
+        Map<String, String> response = gameController.blackTicket(gameId, playerName, position, "TAXI");
+        assertEquals("Mr.X hat gewonnen!", response.get("message"));
+    }
+
+    @Test
+    void blackTicket_WhenMoveSucceedsAndNoWinner_ReturnsSuccessMessage() {
+        when(gameManager.getGame(gameId)).thenReturn(gameState);
+        when(gameState.getAllPlayers()).thenReturn(Map.of(playerName, player));
+        when(gameState.moveBlackTicket(playerName, position, Ticket.TAXI)).thenReturn(true);
+        when(gameState.getWinner()).thenReturn(GameState.Winner.NONE);
+
+        Map<String, String> response = gameController.blackTicket(gameId, playerName, position, "TAXI");
+        assertEquals(
+                "Spieler " + playerName + " bewegt sich zu " + position + " in Spiel " + gameId,
+                response.get("message")
+        );
+    }
 }
