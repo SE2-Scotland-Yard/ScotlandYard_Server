@@ -113,7 +113,7 @@ class GameInactivityMonitorTest {
 
             monitor.checkInactivePlayersInGame();
 
-            verify(game).movePlayer(eq("BotDave"), eq(42), eq(Ticket.TAXI));
+            verify(game).movePlayer("BotDave", 42, Ticket.TAXI);
         }
     }
 

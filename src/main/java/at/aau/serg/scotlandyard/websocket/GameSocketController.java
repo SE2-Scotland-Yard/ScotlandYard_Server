@@ -17,6 +17,7 @@ public class GameSocketController {
     private final GameManager gameManager;
     private final SimpMessagingTemplate messaging;
     private static final Logger logger = LoggerFactory.getLogger(GameSocketController.class);
+    private static final String SAFE_LOG_LITERAL = "[\n\r\t]";
 
     public GameSocketController(GameManager gameManager, SimpMessagingTemplate messaging) {
         this.gameManager = gameManager;
@@ -31,7 +32,8 @@ public class GameSocketController {
         GameState game = gameManager.getGame(gameId);
         if (game != null) {
             game.updateLastActivity(playerId);
-            logger.info("→ [GAME]]Ping erhalten im Spiel von {}",playerId);
+            String safePlayerId = playerId.replaceAll(SAFE_LOG_LITERAL, "_");
+            logger.info("→ [GAME]]Ping erhalten im Spiel von {}", safePlayerId);
         }
     }
 
@@ -40,12 +42,15 @@ public class GameSocketController {
         String gameId = payload.get("gameId");
         String playerId = payload.get("playerId");
 
-        logger.info("Game leave received: {} {}",gameId,playerId);
+        String safeGameId = gameId != null ? gameId.replaceAll(SAFE_LOG_LITERAL, "_") : "null";
+        String safePlayerId = playerId != null ? playerId.replaceAll(SAFE_LOG_LITERAL, "_") : "null";
+
+        logger.info("Game leave received: {} {}",safeGameId,safePlayerId);
 
         GameState game = gameManager.getGame(gameId);
         if (game != null) {
             game.replaceWithBot(playerId);
-            logger.info("Spieler ersetzt durch Bot: {}",playerId);
+            logger.info("Spieler ersetzt durch Bot: {}",safePlayerId);
         }
     }
 

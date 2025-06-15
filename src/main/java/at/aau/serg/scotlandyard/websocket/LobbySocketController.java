@@ -19,6 +19,7 @@ import java.util.*;
 @Controller
 public class LobbySocketController {
 
+    private final Random random = new Random();
     private final LobbyManager lobbyManager;
     private final GameManager gameManager;
     private final SimpMessagingTemplate messaging;
@@ -26,6 +27,7 @@ public class LobbySocketController {
     private static final String TOPIC_LOBBY_LITERAL = "/topic/lobby/";
     private static final String TOPIC_GAME_LITERAL = "/topic/game/";
     private static final String BOT_PREFIX = "[BOT] ";
+    private static final String SAFE_LOG_LITERAL = "[\n\r\t]";
 
     public LobbySocketController(LobbyManager lobbyManager, GameManager gameManager, SimpMessagingTemplate messaging) {
         this.lobbyManager = lobbyManager;
@@ -103,16 +105,20 @@ public class LobbySocketController {
                 detectives.add((Detective) player);
             }
         }
+
+        if(mrX == null){
+            throw new IllegalStateException("MrX wurde nicht gesetzt, Lobby unvollständig.");
+        }
         for(Detective detective : detectives) {
             if(mrX.getPosition()==detective.getPosition()){
-                mrX.setPos(new Random().nextInt(199)+1);
+                mrX.setPos(random.nextInt(199)+1);
             }
         }
 
         if (!detectives.isEmpty()) {
             game.initRoundManager(detectives, mrX); // RoundManager korrekt initialisieren
 
-            String sanitizedGameId = gameId.replaceAll("[\\n\\r\\t]", "_");
+            String sanitizedGameId = gameId.replaceAll(SAFE_LOG_LITERAL, "_");
             logger.info("Sending GameUpdate to /topic/game/{}", sanitizedGameId);
             logger.info("Aktueller Spieler im Mapper: {}", game.getCurrentPlayerName());
 
@@ -198,7 +204,9 @@ public class LobbySocketController {
     public void handleLeave(@Payload LeaveRequest request) {
         String gameId = request.getGameId();
         String playerId = request.getPlayerId();
-        logger.info("Game leave received: {}, {}" , gameId,playerId);
+        String safeGameId = gameId != null ? gameId.replaceAll(SAFE_LOG_LITERAL, "_") : "null";
+        String safePlayerId = playerId != null ? playerId.replaceAll(SAFE_LOG_LITERAL, "_") : "null";
+        logger.info("Game leave received: {}, {}" , safeGameId,safePlayerId);
 
         Lobby lobby = lobbyManager.getLobby(gameId);
         if (lobby != null) {
@@ -238,7 +246,9 @@ public class LobbySocketController {
         lobby.markReady(botName);
 
         messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId, LobbyMapper.toLobbyState(lobby));
-        logger.info(" Bot '{}' zur Lobby {} hinzugefügt", botName, gameId);
+
+        String safeGameId = gameId != null ? gameId.replaceAll(SAFE_LOG_LITERAL, "_") : "null";
+        logger.info(" Bot '{}' zur Lobby {} hinzugefügt", botName, safeGameId);
     }
 
     @MessageMapping("/lobby/remove-bot")
@@ -261,7 +271,8 @@ public class LobbySocketController {
         if (botToRemove != null) {
             lobby.removePlayer(botToRemove);
             messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId, LobbyMapper.toLobbyState(lobby));
-            logger.info("Bot '{}' aus Lobby {} entfernt", botToRemove, gameId);
+            String safeGameId = gameId != null ? gameId.replaceAll(SAFE_LOG_LITERAL, "_") : "null";
+            logger.info("Bot '{}' aus Lobby {} entfernt", botToRemove, safeGameId);
         }
     }
 

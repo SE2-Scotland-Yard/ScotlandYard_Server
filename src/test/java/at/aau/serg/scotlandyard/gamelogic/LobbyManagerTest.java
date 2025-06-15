@@ -125,4 +125,54 @@ class LobbyManagerTest {
         assertTrue(lobbyManager.getPublicLobbies().isEmpty());
     }
 
+    @Test
+    void leaveLobby_removesPlayerButLobbyRemains_ifPlayersLeft() {
+        LobbyManager lobbyManager = new LobbyManager();
+        Lobby lobby = lobbyManager.getOrCreateLobby("game1", true);
+        lobby.addPlayer("player1");
+        lobby.addPlayer("player2");
+
+        lobbyManager.leaveLobby("game1", "player1");
+
+        Lobby afterLeave = lobbyManager.getLobby("game1");
+        assertNotNull(afterLeave);
+        assertFalse(afterLeave.getPlayers().contains("player1"));
+        assertTrue(afterLeave.getPlayers().contains("player2"));
+    }
+
+    @Test
+    void leaveLobby_removesLobby_ifNoPlayersLeft() {
+        LobbyManager lobbyManager = new LobbyManager();
+        Lobby lobby = lobbyManager.getOrCreateLobby("game2", true);
+        lobby.addPlayer("player1");
+
+        lobbyManager.leaveLobby("game2", "player1");
+
+        assertFalse(lobbyManager.lobbyExists("game2"), "Lobby sollte entfernt werden, wenn keine Spieler mehr drin sind");
+        assertNull(lobbyManager.getLobby("game2"), "Lobby sollte nicht mehr existieren");
+    }
+
+    @Test
+    void leaveLobby_removesLobby_ifOnlyBotsLeft() {
+        LobbyManager lobbyManager = new LobbyManager();
+        Lobby lobby = lobbyManager.getOrCreateLobby("game3", true);
+        lobby.addPlayer("[BOT]Bot1");
+        lobby.addPlayer("player1");
+
+        lobbyManager.leaveLobby("game3", "player1");
+
+        assertFalse(lobbyManager.lobbyExists("game3"));
+        assertNull(lobbyManager.getLobby("game3"));
+    }
+
+    @Test
+    void leaveLobby_doesNothing_ifLobbyDoesNotExist() {
+        LobbyManager lobbyManager = new LobbyManager();
+
+        lobbyManager.leaveLobby("unknown", "player1");
+
+        assertFalse(lobbyManager.lobbyExists("unknown"));
+        assertNull(lobbyManager.getLobby("unknown"));
+    }
+
 }
