@@ -78,7 +78,7 @@ public class Lobby {
 
     public void selectAvatar(String player, Integer avatar) {
         // Wenn der Spieler MRX ist → kein Avatar erlaubt
-        if ("MRX".equals(selectedRoles.get(player))) {
+        if (Role.MRX.equals(selectedRoles.get(player))) {
             avatars.remove(player);
             return;
         }
