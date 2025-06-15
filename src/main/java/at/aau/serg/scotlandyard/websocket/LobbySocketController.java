@@ -149,14 +149,14 @@ public class LobbySocketController {
 
             String currentRole = String.valueOf(lobby.getSelectedRole(msg.getPlayerId()));
 
-            boolean roleChanged = !msg.getRole().equals(currentRole);
+            boolean roleChanged = !String.valueOf(msg.getRole()).equals(currentRole);
             lobby.selectRole(msg.getPlayerId(), msg.getRole());
 
             if (roleChanged) {
                 lobby.markNotReady(msg.getPlayerId());
 
                 // Avatar löschen, wenn Rolle zu MRX wechselt
-                if ("MRX".equals(msg.getRole())) {
+                if (Role.MRX.equals(msg.getRole())) {
                     lobby.getAvatars().remove(msg.getPlayerId());
                 }
             }
