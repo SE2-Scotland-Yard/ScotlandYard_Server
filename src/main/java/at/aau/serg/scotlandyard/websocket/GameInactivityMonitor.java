@@ -29,7 +29,7 @@ public class GameInactivityMonitor {
     @Scheduled(fixedRate = 60_000) // alle 60 Sekunden
     public void checkInactivePlayersInGame() {
         long now = System.currentTimeMillis();
-        long timeoutMillis = 3 * 60 * 1000;
+        long timeoutMillis = 3L * 60L * 1000L;
 
         for (String gameId : gameManager.getAllGameIds()) {
             GameState game = gameManager.getGame(gameId);
