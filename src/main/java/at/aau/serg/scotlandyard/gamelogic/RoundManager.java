@@ -111,8 +111,9 @@ public class RoundManager {
             new Thread(() -> {
                 try {
                     Thread.sleep(3000); // Denkzeit
-                } catch (InterruptedException ignored) {}
-
+                } catch (InterruptedException e) {
+                    logger.warn("Bot thread interrupted", e);
+                }
                 BotLogic.executeBotMove(currentPlayer, gameState);
             }).start();
         }
