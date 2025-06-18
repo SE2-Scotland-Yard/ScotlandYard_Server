@@ -36,7 +36,7 @@ class BotFactoryTest {
 
         assertNotNull(bot);
         assertInstanceOf(BotDetective.class, bot);
-        assertEquals("[BOT] Bot1", bot.getName());
+        assertEquals("[BOT Bot1]", bot.getName());
         assertEquals(detective.getPosition(), bot.getPosition());
 
     }
@@ -47,7 +47,7 @@ class BotFactoryTest {
 
         assertNotNull(bot2);
         assertInstanceOf(MrX.class, bot2);
-        assertEquals("[BOT] Bot2", bot2.getName());
+        assertEquals("[BOT Bot2]", bot2.getName());
         assertEquals(mrx.getPosition(), bot2.getPosition());
 
     }
