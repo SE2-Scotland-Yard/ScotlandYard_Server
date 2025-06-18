@@ -105,7 +105,7 @@ public class RoundManager {
         }
 
         // Bot automatisch bewegen
-        if (currentPlayer.getName().startsWith("[BOT]")) {
+        if (currentPlayer.getName().startsWith("[BOT")) {
             logger.info("🤖 Bot '{}' ist an der Reihe – führe automatischen Zug aus", currentPlayer.getName());
 
             new Thread(() -> {

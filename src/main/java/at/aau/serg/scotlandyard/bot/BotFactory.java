@@ -12,8 +12,8 @@ public class BotFactory {
 
     public static Player createBotReplacement(Player original) {
         String name = original.getName();
-        if (!name.startsWith("[BOT] ")) {
-            name = "[BOT] " + name;
+        if (!name.startsWith("[BOT")) {
+            name = "[BOT " + name + "]";
         }
 
         int pos = original.getPosition();
