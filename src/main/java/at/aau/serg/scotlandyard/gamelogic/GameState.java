@@ -406,6 +406,11 @@ public class GameState {
         int to = getMrXPosition();
         int from = player.getPosition();
 
+        if (from == to) {
+            logger.info("➡️🤖➡️️BOT!from==to{} to{}", player.getName(), to);
+            return new ArrayList<>();
+        }
+
         Map<Integer, Integer> distances = new HashMap<>();
         Map<Integer, Map.Entry<Integer, Ticket>> predecessors = new HashMap<>();
         PriorityQueue<Integer> queue = new PriorityQueue<>(Comparator.comparingInt(distances::get));
@@ -436,23 +441,38 @@ public class GameState {
             }
         }
 
-        if (!distances.containsKey(to)) {
-            return new ArrayList<>();
+        if (distances.containsKey(to)) {
+            int current = to;
+            while (predecessors.get(current).getKey() != from) {
+                current = predecessors.get(current).getKey();
+            }
+            Map.Entry<Integer, Ticket> nextMove = Map.entry(current, predecessors.get(current).getValue());
+            logger.info("➡️🤖➡️🤖️➡️BOT MOVE (Shortest Path Found): {}", nextMove);
+            return Collections.singletonList(nextMove);
+        }else {
+            logger.info("➡️🤖➡️️BOT!distances.containsKey{} to{}", player.getName(), distances.get(to));
+            return findAnyValidMove(player);
         }
 
-        if (from == to) {
-            return new ArrayList<>();
-        }
-
-        int current = to;
-        while (predecessors.get(current).getKey() != from) {
-            current = predecessors.get(current).getKey();
-        }
-
-        Map.Entry<Integer, Ticket> nextMove = Map.entry(current, predecessors.get(current).getValue());
-
-        return Collections.singletonList(nextMove);
     }
+
+    private List<Map.Entry<Integer, Ticket>> findAnyValidMove(Player player) {
+        int currentPosition = player.getPosition();
+
+        for (Edge edge : board.getConnectionsFrom(currentPosition)) {
+            if (player.getTickets().hasTicket(edge.getTicket())) {
+                if (player instanceof Detective && isPositionOccupied(edge.getTo())) {
+                    continue;
+                }
+                Map.Entry<Integer, Ticket> anyMove = Map.entry(edge.getTo(), edge.getTicket());
+                logger.info("➡️🤖🤖🤖➡️BOT MOVE (Fallback - Any Valid Move): {}", anyMove);
+                return Collections.singletonList(anyMove);
+            }
+        }
+        logger.info("🤖🤖🤖🤖🤖🤖️️BOT! No valid fallback move found for {}. Player might be trapped or out of tickets.", player.getName());
+        return new ArrayList<>();
+    }
+
     public Integer getMrXPosition() {
         for (Player p : players.values()) {
             if (p instanceof MrX) {
