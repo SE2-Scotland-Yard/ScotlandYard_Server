@@ -1,6 +1,7 @@
 package at.aau.serg.scotlandyard.gamelogic;
 
 
+import at.aau.serg.scotlandyard.bot.BotPlayer;
 import at.aau.serg.scotlandyard.gamelogic.player.Detective;
 import at.aau.serg.scotlandyard.gamelogic.player.MrX;
 import at.aau.serg.scotlandyard.gamelogic.player.Player;
@@ -401,6 +402,71 @@ class GameStateTest {
         assertTrue(result);
         verify(mrX).moveBlack(eq(42), eq(Ticket.BLACK), any());
     }
+
+    @Test
+    void testGetShortestMoveTo_WithValidPath() {
+        when(mrX.getPosition()).thenReturn(3); // Zielposition
+        when(detective.getPosition()).thenReturn(1); // Startposition
+        when(detective.getTickets()).thenReturn(getDefaultTickets());
+
+        var result = gameState.getShortestMoveTo("Detective");
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
+        assertTrue(result.get(0).getKey() > 0);
+    }
+
+    @Test
+    void testGetShortestMoveTo_PlayerCompletelyTrapped() {
+        when(detective.getPosition()).thenReturn(1);
+
+        Map<Ticket, Integer> noTickets = new EnumMap<>(Ticket.class);
+        for (Ticket t : Ticket.values()) {
+            noTickets.put(t, 0);
+        }
+        when(detective.getTickets()).thenReturn(new PlayerTickets(noTickets));
+
+        var result = gameState.getShortestMoveTo("Detective");
+
+        //keine Moves möglich
+        assertTrue(result.isEmpty());
+    }
+
+
+
+
+    @Test
+    void testGetShortestMoveTo_NoPathUsesFallback() {
+        when(mrX.getPosition()).thenReturn(99); // Kein Pfad dorthin
+        when(detective.getPosition()).thenReturn(1);
+        when(detective.getTickets()).thenReturn(getDefaultTickets());
+
+        var result = gameState.getShortestMoveTo("Detective");
+        assertFalse(result.isEmpty());
+    }
+
+    @Test
+    void testOnlyBotsLeft_ReturnsTrue() {
+        gameState.getAllPlayers().clear();
+
+        BotPlayer bot1 = mock(BotPlayer.class);
+        gameState.addPlayer("Bot1", bot1);
+
+        BotPlayer bot2 = mock(BotPlayer.class);
+        gameState.addPlayer("Bot2", bot2);
+
+        assertTrue(gameState.onlyBotsLeft());
+    }
+
+
+    @Test
+    void testOnlyBotsLeft_ReturnsFalse() {
+        assertFalse(gameState.onlyBotsLeft());
+    }
+
+
+
+
+
 
 
 
