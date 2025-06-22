@@ -59,8 +59,11 @@ public class LobbySocketController {
 
                 // Alle wieder auf 'nicht bereit' setzen
                 for (String player : lobby.getPlayers()) {
-                    lobby.markNotReady(player);
+                    if (lobby.isBot(player)) {   //nur echte spieler
+                        lobby.markNotReady(player);
+                    }
                 }
+
 
                 // Aktualisierten Lobby-Zustand erneut senden
                 messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId, LobbyMapper.toLobbyState(lobby));
@@ -71,8 +74,11 @@ public class LobbySocketController {
                 messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId + "/error",
                         Map.of("error", "Zu wenig Spieler, bitte Bot hinzufügen"));
 
+                // Alle wieder auf 'nicht bereit' setzen
                 for (String player : lobby.getPlayers()) {
-                    lobby.markNotReady(player);
+                    if (lobby.isBot(player)) {   //nur echte spieler
+                        lobby.markNotReady(player);
+                    }
                 }
 
                 messaging.convertAndSend(TOPIC_LOBBY_LITERAL + gameId, LobbyMapper.toLobbyState(lobby));
@@ -258,14 +264,13 @@ public class LobbySocketController {
         if (lobby == null) return;
 
         // Finde den zuletzt hinzugefügten Bot (höchste Nummer)
+        // absteigend
         String botToRemove = lobby.getPlayers().stream()
-                .filter(name -> name.startsWith(BOT_PREFIX))
-                .sorted((a, b) -> {
+                .filter(name -> name.startsWith(BOT_PREFIX)).min((a, b) -> {
                     int numA = Integer.parseInt(a.replace(BOT_PREFIX, ""));
                     int numB = Integer.parseInt(b.replace(BOT_PREFIX, ""));
                     return Integer.compare(numB, numA); // absteigend
                 })
-                .findFirst()
                 .orElse(null);
 
         if (botToRemove != null) {
