@@ -4,7 +4,6 @@ import at.aau.serg.scotlandyard.bot.BotLogic;
 import at.aau.serg.scotlandyard.gamelogic.player.*;
 import at.aau.serg.scotlandyard.gamelogic.player.tickets.Ticket;
 import lombok.Getter;
-import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,7 +109,7 @@ public class RoundManager {
 
             new Thread(() -> {
                 try {
-                    Thread.sleep(3000); // Denkzeit
+                    Thread.sleep(2000); // Denkzeit
                 } catch (InterruptedException e) {
                     logger.warn("Bot thread interrupted", e);
                 }
