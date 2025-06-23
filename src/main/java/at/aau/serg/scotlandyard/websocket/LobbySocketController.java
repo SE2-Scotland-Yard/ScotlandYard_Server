@@ -59,7 +59,7 @@ public class LobbySocketController {
 
                 // Alle wieder auf 'nicht bereit' setzen
                 for (String player : lobby.getPlayers()) {
-                    if (lobby.isBot(player)) {   //nur echte spieler
+                    if (lobby.isHuman(player)) {   //nur echte spieler
                         lobby.markNotReady(player);
                     }
                 }
@@ -76,7 +76,7 @@ public class LobbySocketController {
 
                 // Alle wieder auf 'nicht bereit' setzen
                 for (String player : lobby.getPlayers()) {
-                    if (lobby.isBot(player)) {   //nur echte spieler
+                    if (lobby.isHuman(player)) {   //nur echte spieler
                         lobby.markNotReady(player);
                     }
                 }

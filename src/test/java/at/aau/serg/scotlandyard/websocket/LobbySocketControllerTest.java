@@ -166,17 +166,21 @@ class LobbySocketControllerTest {
     }
 
     @Test
-    void testHandleReady_AllReadyButNoMrX() {
-        when(lobbyManager.getLobby("game8")).thenReturn(lobby);
+    void testHandleReady_AllReadyButNoMrX_IgnoresBots() {
+        when(lobbyManager.getLobby("gameX")).thenReturn(lobby);
         when(lobby.allReady()).thenReturn(true);
         when(lobby.hasEnoughPlayers()).thenReturn(true);
         when(lobby.isStarted()).thenReturn(false);
         when(lobby.hasExactlyOneMrX()).thenReturn(false);
-        when(lobby.getPlayers()).thenReturn(Set.of("Player1", "Player2"));
+        when(lobby.getPlayers()).thenReturn(Set.of("Human1", "Bot1"));
+
+        when(lobby.isHuman("Human1")).thenReturn(true);
+        when(lobby.isHuman("Bot1")).thenReturn(false);
+
 
         ReadyMessage msg = new ReadyMessage();
-        msg.setGameId("game8");
-        msg.setPlayerId("Player1");
+        msg.setGameId("gameX");
+        msg.setPlayerId("Human1");
 
         try (MockedStatic<LobbyMapper> mocked = mockStatic(LobbyMapper.class)) {
             LobbyState mockState = mock(LobbyState.class);
@@ -184,22 +188,21 @@ class LobbySocketControllerTest {
 
             controller.handleReady(msg);
 
+            // Es wird eine Fehlermeldung gesendet
             verify(messaging).convertAndSend(
-                    eq("/topic/lobby/game8/error"),
-                    (Object) argThat(obj -> {
-                        if (!(obj instanceof Map<?, ?> errorMap)) return false;
-                        return errorMap.containsKey("error") &&
-                                "Es konnte kein Verbrecher ausgemacht werden".equals(errorMap.get("error"));
-                    })
+                    eq("/topic/lobby/gameX/error"),
+                    (Object) argThat(obj -> obj instanceof Map<?, ?> errorMap &&
+                            "Es konnte kein Verbrecher ausgemacht werden".equals(errorMap.get("error")))
             );
+            verify(lobby).markNotReady("Human1");
+            verify(lobby, never()).markNotReady("Bot1");
 
 
-
-            verify(lobby).markNotReady("Player1");
-            verify(lobby).markNotReady("Player2");
-            verify(messaging, atLeastOnce()).convertAndSend("/topic/lobby/game8", mockState);
+            // Lobby-State erneut gesendet
+            verify(messaging, atLeastOnce()).convertAndSend(eq("/topic/lobby/gameX"), eq(mockState));
         }
     }
+
 
     @Test
     void testHandleAddBot_AddsBotAndMarksReady() {
