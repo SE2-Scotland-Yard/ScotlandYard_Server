@@ -134,5 +134,10 @@ public class Lobby {
         return avatars;
     }
 
+    public boolean isHuman(String playerName) {
+        return playerName == null || !playerName.startsWith("[BOT");
+    }
+
+
 }
 
