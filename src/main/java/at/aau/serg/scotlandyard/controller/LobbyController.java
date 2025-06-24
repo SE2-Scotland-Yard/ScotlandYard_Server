@@ -39,6 +39,8 @@ public class LobbyController {
         Lobby lobby = lobbyManager.createLobby(isPublic);
         // 2) Ersteller direkt als Spieler hinzufügen
         lobby.addPlayer(name);
+        //2.1) aktivität setzen
+        lobby.updateLastActivity(name);
 
         // 3)  Zustand broadcasten
         LobbyState state = LobbyMapper.toLobbyState(lobby);
@@ -63,6 +65,9 @@ public class LobbyController {
             return ResponseEntity.badRequest()
                     .body(new JoinResponse("Lobby ist voll oder bereits gestartet."));
         }
+        // aktivität setzen
+        lobby.updateLastActivity(name);
+
         String sanitizedGameId = gameId.replaceAll("[\\n\\r\\t]", "_");
         logger.info("WS-Broadcast: /topic/lobby/{}" , sanitizedGameId);
         logger.info("Spieler in der Lobby: {}" , lobby.getPlayers());
